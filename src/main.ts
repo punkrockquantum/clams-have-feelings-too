@@ -28,7 +28,7 @@ function cioSVG(stage: number): string {
   const eyes = stage === 5
     ? `<rect x="76" y="88" width="108" height="30" rx="15" fill="#141414"/><rect x="84" y="94" width="38" height="9" rx="4" fill="#8fe3ff"/><rect x="140" y="94" width="34" height="9" rx="4" fill="#8fe3ff"/><path d="M76 100 L58 92 M184 100 L202 92" stroke="#141414" stroke-width="5" stroke-linecap="round"/>`
     : `<ellipse cx="98" cy="106" rx="17" ry="21" fill="#fff" stroke="#141414" stroke-width="3.5"/><ellipse cx="162" cy="106" rx="17" ry="21" fill="#fff" stroke="#141414" stroke-width="3.5"/>${veins}<circle cx="${98 + pupilOff[0]}" cy="${106 + pupilOff[1]}" r="5.5" fill="#141414"/><circle cx="${162 + pupilOff[0]}" cy="${106 + pupilOff[1]}" r="5.5" fill="#141414"/><circle cx="${100 + pupilOff[0]}" cy="${103 + pupilOff[1]}" r="1.8" fill="#fff"/><circle cx="${164 + pupilOff[0]}" cy="${103 + pupilOff[1]}" r="1.8" fill="#fff"/>`;
-  const shadesOnHead = stage === 4 ? `<rect x="84" y="34" width="92" height="20" rx="10" fill="#141414" transform="rotate(-5 130 44)"/>` : "";
+  const shadesOnHead = stage === 3 || stage === 4 ? `<rect x="84" y="34" width="92" height="20" rx="10" fill="#141414" transform="rotate(-5 130 44)"/>` : "";
   /* --- mouth on a lighter muzzle, overbite-ish expressive shapes --- */
   const mouth = [
     `<rect x="100" y="146" width="60" height="18" rx="5" fill="#fff" stroke="#141414" stroke-width="3"/><path d="M115 146 v18 M130 146 v18 M145 146 v18 M100 155 h60" stroke="#141414" stroke-width="2"/>`,
@@ -45,20 +45,20 @@ function cioSVG(stage: number): string {
   const flowers = `<g><g fill="#fff"><circle cx="86" cy="238" r="6"/><circle cx="98" cy="230" r="6"/><circle cx="98" cy="246" r="6"/><circle cx="110" cy="238" r="6"/></g><circle cx="98" cy="238" r="4" fill="#ffd21f"/><g fill="#ffd21f"><circle cx="164" cy="262" r="6"/><circle cx="176" cy="254" r="6"/><circle cx="176" cy="270" r="6"/><circle cx="188" cy="262" r="6"/></g><circle cx="176" cy="262" r="4" fill="#ff4f9a"/><g fill="#7ee08a"><circle cx="112" cy="282" r="5"/><circle cx="122" cy="276" r="5"/><circle cx="122" cy="288" r="5"/><circle cx="132" cy="282" r="5"/></g><circle cx="122" cy="282" r="3.5" fill="#fff"/></g>`;
   const suitCol = ["#6b7280", "#7a8699", "#8fa3bf", "#3366aa", "#37b24d", "#ff5f8f"][stage];
   const tieRot = stage === 0 ? "rotate(18 130 196)" : stage === 1 ? "rotate(-11 130 196)" : stage === 2 ? "rotate(5 130 196)" : "";
-  const tie = stage <= 3 ? `<g transform="${tieRot}"><path d="M122 182 h16 l4 14 l-12 38 l-12 -38 Z" fill="${stage <= 1 ? "#d92626" : "#c2255c"}" stroke="#141414" stroke-width="3"/></g><path d="M130 176 l-14 8 l14 22 l14 -22 Z" fill="#fff" stroke="#141414" stroke-width="3"/>` : "";
+  const tie = stage <= 2 ? `<g transform="${tieRot}"><path d="M122 182 h16 l4 14 l-12 38 l-12 -38 Z" fill="${stage <= 1 ? "#d92626" : "#c2255c"}" stroke="#141414" stroke-width="3"/></g><path d="M130 176 l-14 8 l14 22 l14 -22 Z" fill="#fff" stroke="#141414" stroke-width="3"/>` : "";
   const folds = stage <= 3 ? `<path d="M76 236 q10 30 4 62 M184 236 q-10 30 -4 62 M96 214 q-6 20 0 40 M164 214 q6 20 0 40" stroke="#00000033" stroke-width="4" fill="none"/>` : `<path d="M84 232 q6 26 0 52 M176 232 q-6 26 0 52" stroke="#0000002b" stroke-width="4" fill="none"/>`;
   const torso = stage === 5
     ? `<path d="M66 290 L192 290 L198 334 L158 334 L130 304 L102 334 L60 334 Z" fill="#2f6fd0" stroke="#141414" stroke-width="4"/><path d="M72 216 Q130 192 188 216 L192 302 L156 302 L130 238 L104 302 L68 302 Z" fill="${suitCol}" stroke="#141414" stroke-width="4"/><path d="M104 302 L130 238 L156 302 L144 302 L130 262 L116 302 Z" fill="${muzzle}" stroke="#141414" stroke-width="3"/>${flowers}`
     : stage === 4
-    ? `<path d="M66 356 L74 214 Q130 192 186 214 L194 356 Z" fill="#4a5568" stroke="#141414" stroke-width="4"/><path d="M74 214 Q130 192 186 214 L190 306 L70 306 Z" fill="${suitCol}" stroke="#141414" stroke-width="4"/><path d="M108 200 l22 18 l22 -18 l-6 26 h-32 Z" fill="#2f9e44" stroke="#141414" stroke-width="3"/><circle cx="130" cy="238" r="3.5" fill="#141414"/><circle cx="130" cy="256" r="3.5" fill="#141414"/>`
-    : `<path d="M66 356 L74 214 Q130 192 186 214 L194 356 Z" fill="#3d4b63" stroke="#141414" stroke-width="4"/><path d="M74 214 Q130 192 186 214 L190 310 L70 310 Z" fill="${suitCol}" stroke="#141414" stroke-width="4"/><path d="M98 198 L130 252 L162 198 L172 214 L130 300 L88 214 Z" fill="#26314a" stroke="#141414" stroke-width="3"/><path d="M112 202 L130 226 L148 202 L142 250 L130 262 L118 250 Z" fill="#fff" stroke="#141414" stroke-width="2.5"/>${tie}`;
+    ? `<path d="M66 356 L74 214 Q130 192 186 214 L194 356 Z" fill="#4a5568" stroke="#141414" stroke-width="4"/><path d="M74 214 Q130 192 186 214 L190 306 L70 306 Z" fill="#ff5f8f" stroke="#141414" stroke-width="4"/><path d="M108 198 l22 20 l22 -20 l-8 30 h-28 Z" fill="#ffe29a" stroke="#141414" stroke-width="3"/><circle cx="130" cy="240" r="3.5" fill="#141414"/><circle cx="130" cy="258" r="3.5" fill="#141414"/><circle cx="130" cy="276" r="3.5" fill="#141414"/>${flowers}`
+    : `<path d="M66 356 L74 214 Q130 192 186 214 L194 356 Z" fill="#3d4b63" stroke="#141414" stroke-width="4"/><path d="M74 214 Q130 192 186 214 L190 310 L70 310 Z" fill="${suitCol}" stroke="#141414" stroke-width="4"/><path d="M98 198 L130 252 L162 198 L172 214 L130 300 L88 214 Z" fill="#26314a" stroke="#141414" stroke-width="3"/><path d="M112 202 L130 226 L148 202 L142 250 L130 262 L118 250 Z" fill="#fff" stroke="#141414" stroke-width="2.5"/>${tie}${stage === 3 ? `<g fill="#ff8fb3"><circle cx="90" cy="240" r="5"/><circle cx="100" cy="234" r="5"/><circle cx="100" cy="246" r="5"/><circle cx="110" cy="240" r="5"/></g><circle cx="100" cy="240" r="3" fill="#ffd21f"/>` : ""}`;
   const legs = stage === 5
     ? `<path d="M102 324 v27 M158 324 v27" stroke="${skin}" stroke-width="16" stroke-linecap="round"/><path d="M84 350 h36 l5 9 H80 Z M142 350 h36 l5 9 h-44 Z" fill="#a9713a" stroke="#141414" stroke-width="3"/><path d="M88 352 q14 -8 28 0 M146 352 q14 -8 28 0" stroke="#141414" stroke-width="3" fill="none"/>`
     : `<path d="M88 330 h34 v14 H84 Z M138 330 h34 v14 h-38 Z" fill="#222" stroke="#141414" stroke-width="3"/>`;
   const cocktail = stage === 5 ? `<g><path d="M209 308 l13 -26 M222 282 l-5 20 h22 Z" fill="#bfefff" stroke="#141414" stroke-width="3"/><path d="M213 292 h19" stroke="#ff4f9a" stroke-width="5"/><path d="M229 270 l17 -13 l-3 19 Z" fill="#37d35a" stroke="#141414" stroke-width="2.5"/><circle cx="230" cy="274" r="4" fill="#ffd21f" stroke="#141414" stroke-width="2"/></g>` : "";
   const hand = (x: number, y: number) => `<g><ellipse cx="${x}" cy="${y}" rx="13" ry="16" fill="${skin}" stroke="#141414" stroke-width="3"/><path d="M${x - 8} ${y + 2} q3 8 1 14 M${x} ${y + 4} q1 9 -1 15 M${x + 8} ${y + 2} q-2 8 -1 13" stroke="#141414" stroke-width="2" fill="none"/></g>`;
   return `<svg viewBox="0 0 260 360" class="wobble" role="img" aria-label="The CIO, stage ${stage}">
-    ${stage === 5 ? `<rect x="3" y="3" width="254" height="354" rx="20" fill="#8fe3ff" stroke="#141414" stroke-width="3"/><circle cx="224" cy="42" r="24" fill="#ffd21f" stroke="#141414" stroke-width="3"/><path d="M14 78 q2 -30 16 -44 M15 76 q-8 -24 -6 -40 M17 78 q16 -20 32 -24" stroke="#2f9e44" stroke-width="6" fill="none" stroke-linecap="round"/>` : ""}
+    ${stage === 4 ? `<rect x="3" y="3" width="254" height="354" rx="20" fill="#dff6ff" stroke="#141414" stroke-width="3"/><circle cx="226" cy="38" r="17" fill="#ffd21f" stroke="#141414" stroke-width="3"/>` : stage === 5 ? `<rect x="3" y="3" width="254" height="354" rx="20" fill="#8fe3ff" stroke="#141414" stroke-width="3"/><circle cx="224" cy="42" r="24" fill="#ffd21f" stroke="#141414" stroke-width="3"/><path d="M14 78 q2 -30 16 -44 M15 76 q-8 -24 -6 -40 M17 78 q16 -20 32 -24" stroke="#2f9e44" stroke-width="6" fill="none" stroke-linecap="round"/>` : ""}
     ${stage >= 4 ? "" : ""}${sweat}${anger}
     ${torso}${legs}
     <path d="M72 222 q-26 34 -18 76 M188 222 q26 34 18 76" stroke="${stage >= 4 ? skin : suitCol}" stroke-width="19" fill="none" stroke-linecap="round"/>
@@ -77,7 +77,7 @@ function cioSVG(stage: number): string {
 
 /* ---------- Intro: punchy, staged, skippable (full read ≈ 2 min) ---------- */
 const SLIDES = [
-  { h: "📟 THE BACKSTORY", t: `You are the <b>CIO of a Very Serious Bank</b>. It is Monday. It is 8:59 a.m. Every department has discovered AI at the same time.<br><br>John from Marketing has uploaded <b>all customer data to ChatGPT</b> to make a PowerPoint. Charles wants payroll automated by a mystery SAP plugin. Fred has a security plan called “Mythos” and a cape. Sam is pitching AI concierges to billionaires. Alan is day-trading Bitcoin on Copilot's advice.<br><br>All of it runs on Copilot. All of it costs a fortune. <b>None of it is governed.</b>` },
+  { h: "📟 THE BACKSTORY", t: `You are the <b>CIO of a Very Serious Bank</b>. It is Monday. It is 8:59 a.m. Every department has discovered AI at the same time.<br><br>John from Marketing has uploaded <b>all customer data to ChatGPT</b> to make a PowerPoint. Charles wants payroll automated by a mystery SAP plugin. Fred has a “security plan” involving a magic amulet, three firewalls drawn in crayon, and a cape. Sam is pitching AI concierges to billionaires. Alan is day-trading Bitcoin on Copilot's advice.<br><br>All of it runs on Copilot. All of it costs a fortune. <b>None of it is governed.</b>` },
   { h: "🎯 THE MISSION", t: `Survive the onslaught of request &amp; incident cards. Keep <b>Stress, Risk and Cost</b> below 100, keep <b>Board Confidence</b> above zero, and fill your <b>Chill meter</b> to reach RELAXATION — Hawaiian shirt, shorts, sunglasses, beach.<br><br>Good calls extend your timer and calm the bank. Reach <b>100 Chill</b> for instant beach mode, or survive to the final whistle with the bank intact.` },
   { h: "⚠️ THE TRAP (READ THIS!)", t: `Every card offers 3 strategies — <span class="kbd">INFRA</span> <span class="kbd">NETWORK</span> <span class="kbd">SOFTWARE</span>. The tempting quick win feels AMAZING now: stress melts, everyone's happy…<br><br>…then, 15–25 seconds later: <b>WHAM!</b> The consequence lands — worse than the original problem, often spawning a FOLLOW-UP card. Real CIOs play the long game. So should you.<br><br>Or hit <b>IGNORE</b> (<span class="kbd">0</span>): the requester loiters by your desk, relaxed, foot tapping… 3 seconds later they either get <b>BORED</b> and wander off (free win!) or come back <b>WORSE, with friends</b>. Ignoring 🤪 silly requests is often smart. Ignoring 🚨 serious ones is how sequels happen.<br><br>Your face will tell the story: wild hair &amp; bloodshot eyes when it's bad; smoothie &amp; sunglasses when you win.` },
   { h: "🤝 YOUR PARTNERS", t: `<b>Digital Realty</b> — colocation on PlatformDIGITAL®, high-density AI-ready halls, and ServiceFabric® private interconnection to clouds &amp; partners instead of the wild public internet.<br><b>Oracle</b> — Oracle Cloud Infrastructure (OCI), Autonomous Database, Fusion Applications (ERP/HCM) and OCI AI services: enterprise AI with governance and human approval.<br><b>OEM partners</b> — validated servers &amp; branch kit that arrive configured, not cursed.<br><br>Partner choices are usually the grown-up, long-game move. Click a card, then pick <span class="kbd">1</span> <span class="kbd">2</span> <span class="kbd">3</span> — or just tap. <b>GOOD LUCK. YOU'LL NEED IT.</b>` },
@@ -108,12 +108,14 @@ const loitering = () => inbox.filter((x) => x.loiterUntil !== undefined);
 let meters: Meters, timeLeft = 75, elapsed = 0, score = 0, combo = 0, bestCombo = 0;
 let inbox: Live[] = [], selectedUid = 0, uidSeq = 1, deck: GameCard[] = [], consequences: Scheduled[] = [];
 let log: string[] = [], over = false, timerId: number | undefined, lastSpawn = 0;
+let needsRender = false, lastRenderedSecond = -1, newestUid = 0;
 
 function shuffledDeck() { deck = CARDS.filter((x) => !x.followUp).sort(() => Math.random() - 0.5); }
 function spawn(card?: GameCard) {
   if (!deck.length) shuffledDeck();
   const c = card ?? deck.pop()!;
-  inbox.push({ uid: uidSeq++, card: c });
+  const live = { uid: uidSeq++, card: c };
+  inbox.push(live); newestUid = live.uid; needsRender = true;
   if (!waiting().some((x) => x.uid === selectedUid)) selectedUid = waiting()[0]?.uid ?? 0;
   if (waiting().length > 5) { meters = applyEffects(meters, { stress: 5 }); burst("INBOX OVERFLOW!"); log.unshift("📥 Inbox overflow! +5 Stress — answer cards faster (or Ignore the silly ones)!"); }
 }
@@ -138,11 +140,13 @@ function tick() {
   if (elapsed - lastSpawn >= spawnInterval(elapsed)) { lastSpawn = elapsed; spawn(); }
   const { due, pending } = dueEvents(consequences, elapsed); consequences = pending;
   for (const ev of due) {
+    needsRender = true;
     meters = applyEffects(meters, ev.fx); burst(ev.sfx); log.unshift(`⏰ CONSEQUENCE! ${ev.text}`); combo = 0;
     if (ev.followUpId) spawn(cardById(ev.followUpId));
   }
   // Ignored requesters finish loitering (~3s): bored & gone, or back and WORSE.
   for (const live of loitering().filter((x) => x.loiterUntil! <= elapsed)) {
+    needsRender = true;
     inbox = inbox.filter((x) => x.uid !== live.uid);
     const sev = severityOf(live.card);
     const r = resolveIgnore(sev, Math.random());
@@ -157,7 +161,9 @@ function tick() {
     }
   }
   checkEnd();
-  if (!over) render();
+  // Only repaint when something changed or the displayed second flips.
+  // Rebuilding the DOM every 200ms used to eat clicks mid-press.
+  if (!over && (needsRender || Math.ceil(timeLeft) !== lastRenderedSecond)) render();
 }
 function checkEnd() {
   const reason = isGameOver(meters);
@@ -221,6 +227,7 @@ function meter(label: string, v: number, color: string, invert = false) {
 }
 const SEV_LABEL = ["", "🤪 SILLY", "😐 MEDIUM", "🚨 SERIOUS"];
 function render() {
+  lastRenderedSecond = Math.ceil(timeLeft); needsRender = false;
   const st = stageFor(meters);
   const sel = waiting().find((x) => x.uid === selectedUid) ?? waiting()[0];
   if (sel) selectedUid = sel.uid; else selectedUid = 0;
@@ -231,15 +238,16 @@ function render() {
         ${meter("😱 Stress", meters.stress, "#ff9f1a")}${meter("☣️ Risk", meters.risk, "#c44dff")}${meter("💸 Cost", meters.cost, "#ff4f9a")}
         ${meter("🏛️ Board Confidence", meters.confidence, "#22c7e8", true)}${meter("🏖️ Chill", meters.chill, "#37d35a", true)}
       </div>
-      <div class="panel timer">⏱️ ${Math.max(0, Math.ceil(timeLeft))}s<div style="font-size:13px">SCORE ${score} · COMBO ×${combo}</div></div>
+      <div class="panel timer">⏱️ ${Math.max(0, Math.ceil(timeLeft))}s<div style="font-size:13px">SCORE ${score} · COMBO ×${combo}<br>📥 ${waiting().length} WAITING</div></div>
     </div>
     <div class="layout">
       <div>
         <div class="panel cio-box">${cioSVG(st)}<div><span class="stage-name">${STAGE_NAMES[st]}</span></div>
         <div class="scorebox">${consequences.length ? `⏳ ${consequences.length} consequence(s) ticking…` : `💬 IT desk says: “${clicheAt(elapsed)}”`}</div>
         <div class="log">${log.slice(0, 7).map((l) => `<div>${l}</div>`).join("")}</div></div>
+        <div class="stackbar ${waiting().length >= 3 ? "hot" : ""}">📥 <b>${waiting().length} new request${waiting().length === 1 ? "" : "s"} stacking up</b>${loitering().length ? ` · 🙈 ${loitering().length} loitering` : ""}<div class="stacktrack"><i style="width:${Math.min(100, (waiting().length / 6) * 100)}%"></i></div><small>${waiting().length >= 4 ? "⚠️ STACKING UP! Answer one or Ignore a silly one — overflow = +Stress!" : waiting().length >= 2 ? "They pile up fast — keep 'em moving, CIO!" : "Inbox under control. Enjoy the silence."}</small></div>
         <h3>📥 INCOMING! (${waiting().length})</h3>
-        <div class="queue">${waiting().map((x) => `<button class="qcard ${x.uid === selectedUid ? "sel" : ""} ${x.card.followUp ? "follow" : ""}" data-uid="${x.uid}">${x.card.emoji} ${x.card.title}<small>${x.card.person} · ${x.card.dept} · ${SEV_LABEL[severityOf(x.card)]}</small></button>`).join("")}</div>
+        <div class="queue">${waiting().map((x, i) => `<button class="qcard ${x.uid === selectedUid ? "sel" : ""} ${x.card.followUp ? "follow" : ""}" data-uid="${x.uid}"><b>#${i + 1}</b> ${x.card.emoji} ${x.card.title}${x.uid === newestUid ? ` <span class="newtag">🆕 NEW!</span>` : ""}<small>${x.card.person} · ${x.card.dept} · ${SEV_LABEL[severityOf(x.card)]}</small></button>`).join("")}</div>
         ${loitering().map((x) => `<div class="loiter"><span class="loiter-face">😌</span><div><b>${x.card.emoji} ${x.card.person} is loitering…</b><br><small>“…fine. FINE. I'll just wait here.” <span class="foot">🦶</span><i>taptaptap</i> — decides in ${Math.max(0, Math.ceil(x.loiterUntil! - elapsed))}s: 🥱 bored &amp; gone, or 😱 WORSE?</small></div></div>`).join("")}
       </div>
       <div class="panel active">
@@ -264,7 +272,21 @@ window.addEventListener("keydown", (e) => {
 });
 /* Demo hooks for screenshots/QA: ?demo=frazzled or ?demo=beach renders a frozen game at that extreme. */
 const demoMode = new URLSearchParams(location.search).get("demo");
-if (demoMode === "frazzled" || demoMode === "beach") {
+const stageDemo = demoMode ? /^stage([0-5])$/.exec(demoMode) : null;
+if (stageDemo) {
+  startGame();
+  const presets = [
+    { stress: 96, risk: 88, cost: 90, confidence: 12, chill: 2 },
+    { stress: 78, risk: 70, cost: 66, confidence: 30, chill: 14 },
+    { stress: 58, risk: 50, cost: 48, confidence: 48, chill: 30 },
+    { stress: 38, risk: 32, cost: 34, confidence: 64, chill: 48 },
+    { stress: 20, risk: 16, cost: 20, confidence: 82, chill: 68 },
+    { stress: 4, risk: 3, cost: 8, confidence: 98, chill: 100 },
+  ];
+  meters = presets[Number(stageDemo[1])];
+  clearInterval(timerId);
+  render();
+} else if (demoMode === "frazzled" || demoMode === "beach") {
   startGame();
   meters = demoMode === "frazzled"
     ? { stress: 96, risk: 88, cost: 90, confidence: 12, chill: 2 }
