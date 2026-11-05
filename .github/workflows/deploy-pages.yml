@@ -15,11 +15,9 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build-and-deploy:
+  # Runs on every push: proves the game builds and its tests pass.
+  build:
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -32,9 +30,31 @@ jobs:
         run: npm run build
         env:
           PAGES_BASE: /clams-have-feelings-too/
-      - uses: actions/configure-pages@v5
+
+  # Manual only (Run workflow button). The default GITHUB_TOKEN cannot create
+  # a Pages site ("Resource not accessible by integration" from
+  # configure-pages), so auto-deploy on push would fail forever. First enable
+  # Pages once in repo Settings > Pages (source: GitHub Actions), then run
+  # this workflow manually to deploy.
+  deploy:
+    if: github.event_name == 'workflow_dispatch'
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
-          enablement: true
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Build with Pages base path
+        run: npm run build
+        env:
+          PAGES_BASE: /clams-have-feelings-too/
+      - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist
