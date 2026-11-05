@@ -38,7 +38,8 @@ export function dueEvents(queue: Scheduled[], elapsed: number): { due: Scheduled
 }
 /** Spawn interval (s) shrinks as the game accelerates. */
 export function spawnInterval(elapsed: number): number {
-  return Math.max(2.1, 6 - elapsed * 0.045);
+  // Playtest-tuned: starts gentle (~5.2s), presses harder late (1.9s floor) so slow players can overflow late, never early.
+  return Math.max(1.9, 5.2 - elapsed * 0.042);
 }
 /* ---- Ignore mechanic: walk away and hope they get bored ---- */
 export type Severity = 1 | 2 | 3; // 1 = silly/low-stakes, 3 = serious
@@ -54,7 +55,7 @@ export function resolveIgnore(severity: Severity, rng: number): IgnoreResult {
   }
   return {
     outcome: "escalate", sfx: "UH OH!",
-    fx: { stress: 6 + severity * 4, risk: 3 + severity * 3, cost: severity * 2, confidence: -2 - severity * 2, chill: -5, score: 0 },
+    fx: { stress: 5 + severity * 3, risk: 3 + severity * 2, cost: severity * 2, confidence: -2 - severity * 2, chill: -5, score: 0 },
   };
 }
 export function qualityOf(fx: Partial<Effects>): "good" | "bad" | "mixed" {

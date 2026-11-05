@@ -81,7 +81,7 @@ function spawn(card?: GameCard) {
   if (waiting().length > 5) { meters = applyEffects(meters, { stress: 5 }); burst("INBOX OVERFLOW!"); log.unshift("📥 Inbox overflow! +5 Stress — answer cards faster (or Ignore the silly ones)!"); }
 }
 function startGame() {
-  meters = { stress: 45, risk: 40, cost: 42, confidence: 55, chill: 10 };
+  meters = { stress: 45, risk: 40, cost: 30, confidence: 55, chill: 20 };
   timeLeft = 75; elapsed = 0; score = 0; combo = 0; bestCombo = 0; inbox = []; consequences = []; log = ["☎️ The phones begin to ring…"]; over = false; lastSpawn = 0; uidSeq = 1; selectedUid = 0;
   shuffledDeck();
   // Guarantee the five signature incidents appear early
@@ -225,4 +225,15 @@ window.addEventListener("keydown", (e) => {
   const sel = waiting().find((x) => x.uid === selectedUid);
   if (n >= 0 && sel) choose(sel.card.choices[n]);
 });
-renderIntro();
+/* Demo hooks for screenshots/QA: ?demo=frazzled or ?demo=beach renders a frozen game at that extreme. */
+const demoMode = new URLSearchParams(location.search).get("demo");
+if (demoMode === "frazzled" || demoMode === "beach") {
+  startGame();
+  meters = demoMode === "frazzled"
+    ? { stress: 96, risk: 88, cost: 90, confidence: 12, chill: 2 }
+    : { stress: 4, risk: 3, cost: 8, confidence: 98, chill: 100 };
+  clearInterval(timerId);
+  render();
+} else {
+  renderIntro();
+}

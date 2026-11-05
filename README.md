@@ -48,3 +48,5 @@ or comes back escalated, with stress/risk up (serious 🚨 requests only wander
 > rack-scale GPUs, metro power-ladder placement (new "metro-choice" card),
 > and fibre physics (~5 µs/km). The password-gated
 > tokenquest.tokenquest.workers.dev site was not used — the repo is the source.
+
+Demo/QA screenshots: append `?demo=frazzled` or `?demo=beach` to the URL for a frozen game at that extreme (used for the playtest screenshots).
