@@ -24,7 +24,7 @@ export function stageFor(m: Meters): number {
   if (c >= 25) return 1;
   return 0;
 }
-export const STAGE_NAMES = ["TOTAL MELTDOWN!", "FRAZZLED!", "DISHEVELLED & WORRIED", "STEADYING THE SHIP", "SMOOTH OPERATOR", "BEACH MODE 🏖️"];
+export const STAGE_NAMES = ["TOTAL MELTDOWN!", "FRAZZLED!", "I NEED A HOLIDAY!", "STEADYING THE SHIP", "SMOOTH OPERATOR", "BEACH MODE 🏖️"];
 export function isGameOver(m: Meters): string | null {
   if (m.stress >= 100) return "Stress hit 100 — you face-planted into your keyboard. The board prescribes a long nap.";
   if (m.risk >= 100) return "Risk hit 100 — the regulators arrived with a cartoon-sized magnifying glass.";
