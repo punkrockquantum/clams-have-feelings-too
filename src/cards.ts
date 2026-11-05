@@ -51,7 +51,7 @@ export const CARDS: GameCard[] = [
     choices: [
       c("SOFTWARE", "Build it on governed AI services", "OCI AI services + Autonomous Database — rich data, richer controls, consent baked in.", { stress: -4, risk: -9, cost: 6, confidence: 10, chill: 8, time: 6, score: 130 }, { partner: "Oracle · OCI AI + Autonomous Database" }),
       c("INFRA", "Launch on the CEO's laptop", "It's under his desk. It's warm. It's 'the cloud' now.", { stress: -11, risk: 7, cost: -5, chill: -3, score: 30 }, { delayed: { afterSec: 16, text: "SPLAT! The CEO closed the laptop lid. The entire VIP product is asleep.", sfx: "SPLAT!", fx: { stress: 16, risk: 10, cost: 6, confidence: -12, chill: -8 } } }),
-      c("NETWORK", "Private, low-latency client links", "Interconnection close to partners via PlatformDIGITAL® — posh data, private roads.", { stress: -3, risk: -7, cost: 5, confidence: 8, chill: 6, time: 4, score: 100 }, { partner: "Digital Realty · PlatformDIGITAL®" }),
+      c("NETWORK", "Private, low-latency client links", "Put the concierge in a PlatformDIGITAL® metro near the clients and reach clouds/partners over ServiceFabric® — Token Quest's lesson: first-token speed lives or dies on the path, and the public internet is the jittery one.", { stress: -3, risk: -7, cost: 5, confidence: 8, chill: 6, time: 4, score: 100 }, { partner: "Digital Realty · PlatformDIGITAL® metro + ServiceFabric®" }),
     ],
   },
   {
@@ -76,7 +76,7 @@ export const CARDS: GameCard[] = [
     id: "branch-wifi", severity: 2, person: "Marta", dept: "Branches", emoji: "📶", title: "“Branch Wi-Fi died during the lunch rush!”",
     body: "Forty branches, one router each, zero mercy. Customers are paying by interpretive dance.",
     choices: [
-      c("NETWORK", "Dual links + ServiceFabric® backbone", "ServiceFabric® virtual connections between branches, clouds and partners, provisioned on demand — turn up a private link instead of filing a 6-week circuit order. Lunch rush-proof.", { stress: -9, risk: -8, cost: 6, confidence: 8, chill: 8, time: 6, score: 120 }, { partner: "Digital Realty · ServiceFabric®" }),
+      c("NETWORK", "Dual links + ServiceFabric® backbone", "Token Quest-style: a 10G/100G ServiceFabric® port per region, redundant port groups, Layer 2 Links or Layer 3 Connections (50 Mbps–100 Gbps) to branches, clouds and partners. New ports need a cross-connect (plan ~15 days); the virtual links themselves go live in minutes. Lunch rush-proof.", { stress: -9, risk: -8, cost: 6, confidence: 8, chill: 8, time: 6, score: 120 }, { partner: "Digital Realty · ServiceFabric®" }),
       c("INFRA", "OEM swap: proper kit, spares on shelf", "Validated OEM-partner routers, configured before they ship.", { stress: -7, risk: -6, cost: 5, confidence: 6, chill: 6, time: 5, score: 100 }, { partner: "OEM partner · branch kit" }),
       c("SOFTWARE", "Tell branches to 'try turning it off and on'", "It works! In one branch. The other 39 are now off.", { stress: -10, chill: -4, score: 25 }, { delayed: { afterSec: 14, text: "ZONK! Branch bingo: nobody knows which router belongs to whom anymore.", sfx: "ZONK!", fx: { stress: 15, risk: 6, cost: 5, confidence: -10, chill: -8 } } }),
     ],
@@ -122,7 +122,7 @@ export const CARDS: GameCard[] = [
     body: "Users think the spinner is a loading game. Someone reached level 40.",
     choices: [
       c("INFRA", "Move hot workloads onto OCI", "OCI compute + Autonomous Database near the users. Spinner retires.", { stress: -7, risk: -5, cost: 6, confidence: 9, chill: 8, time: 6, score: 120 }, { partner: "Oracle · OCI" }),
-      c("NETWORK", "Private interconnect to the cloud", "ServiceFabric® cloud on-ramps cut the scenic route out of every login.", { stress: -6, risk: -6, cost: 5, confidence: 8, chill: 7, time: 5, score: 115 }, { partner: "Digital Realty · ServiceFabric®" }),
+      c("NETWORK", "Private interconnect to the cloud", "ServiceFabric® cloud on-ramps (AWS, Azure, Google Cloud, IBM Cloud, Oracle Cloud) cut the scenic route out of every login — in Token Quest, private fabric beats peering and thrashes the public internet on jitter.", { stress: -6, risk: -6, cost: 5, confidence: 8, chill: 7, time: 5, score: 115 }, { partner: "Digital Realty · ServiceFabric® cloud on-ramps" }),
       c("SOFTWARE", "Add a funnier spinner", "Engagement UP! Patience DOWN!", { stress: -9, chill: -3, score: 30 }, { delayed: { afterSec: 16, text: "SPLAT! App-store reviews: 'Great spinner, terrible bank.' 1 star.", sfx: "SPLAT!", fx: { stress: 12, risk: 4, cost: 4, confidence: -13, chill: -8 } } }),
     ],
   },
@@ -139,7 +139,7 @@ export const CARDS: GameCard[] = [
     id: "gpu-queue", severity: 1, person: "Ken", dept: "Risk Modelling", emoji: "🎰", title: "“We need GPUs. All of them. By Friday.”",
     body: "Ken's risk models take 9 hours. Ken has tried asking them nicely to hurry up.",
     choices: [
-      c("INFRA", "High-density colocation for AI", "Digital Realty high-density colo built for power-hungry AI kit, without rebuilding your own hall.", { stress: -6, risk: -6, cost: 7, confidence: 9, chill: 8, time: 6, score: 125 }, { partner: "Digital Realty · high-density colocation" }),
+      c("INFRA", "Liquid-cooled hall for the monster racks", "Token Quest's rule: rack-scale NVL72-class kit is liquid-only. Digital Realty's London Innovation Lab runs direct-to-chip liquid cooling at 150 kW per rack or more — put Ken's monsters in a hall built for them, not an air hall with a fan and a prayer.", { stress: -6, risk: -6, cost: 7, confidence: 9, chill: 8, time: 6, score: 125 }, { partner: "Digital Realty · liquid-cooled colocation (150 kW/rack class)" }),
       c("SOFTWARE", "Burst to OCI GPU capacity", "OCI AI infrastructure for the spikes, steady kit at home. Rent the spike, own the base.", { stress: -5, risk: -5, cost: 8, confidence: 8, chill: 7, time: 5, score: 120 }, { partner: "Oracle · OCI AI infrastructure" }),
       c("NETWORK", "Run models on everyone's laptops overnight", "A 4,000-laptop supercomputer made of pure hope.", { stress: -11, cost: -6, chill: -4, score: 25 }, { delayed: { afterSec: 17, text: "FZZT! Facilities report the office is now warm enough to bake bread.", sfx: "FZZT!", fx: { stress: 15, risk: 9, cost: 10, confidence: -9, chill: -8 } } }),
     ],
@@ -148,7 +148,7 @@ export const CARDS: GameCard[] = [
     id: "vendor-lockin", severity: 2, person: "Legal", dept: "Procurement", emoji: "⛓️", title: "“This contract auto-renews for 99 years?!”",
     body: "Page 214. Tiny font. The vendor's pen is already out and it is, legally, a sword.",
     choices: [
-      c("NETWORK", "Open interconnection, no lock-in", "ServiceFabric® connects clouds & partners without betting the bank on one vendor's fabric.", { stress: -5, risk: -10, cost: -6, confidence: 8, chill: 8, time: 6, score: 125 }, { partner: "Digital Realty · ServiceFabric®" }),
+      c("NETWORK", "Open interconnection, no lock-in", "ServiceFabric® reaches AWS, Azure, Google Cloud, IBM Cloud and Oracle Cloud on-ramps, partners in the Service Directory, other metros and Digital Internet from one port — negotiate like you have exits, because you do.", { stress: -5, risk: -10, cost: -6, confidence: 8, chill: 8, time: 6, score: 125 }, { partner: "Digital Realty · ServiceFabric®" }),
       c("SOFTWARE", "Multicloud database options", "Oracle Database services across clouds — negotiate like you have exits. Because you do.", { stress: -4, risk: -8, cost: -4, confidence: 7, chill: 7, time: 5, score: 110 }, { partner: "Oracle · Database@Cloud options" }),
       c("INFRA", "Sign it, future-us can deal", "Future-us has entered the chat and is furious.", { stress: -12, cost: -9, chill: -4, score: 25 }, { delayed: { afterSec: 23, text: "CLANG! Year-1 price rise: +30%. The contract calls this 'a fun surprise'.", sfx: "CLANG!", fx: { stress: 13, risk: 8, cost: 17, confidence: -10, chill: -8 } } }),
     ],
@@ -169,6 +169,24 @@ export const CARDS: GameCard[] = [
       c("SOFTWARE", "One slide: Oracle AI stack, governed", "OCI + Fusion + Autonomous Database: AI embedded in workflows, approvals human.", { stress: -5, risk: -9, cost: 4, confidence: 12, chill: 9, time: 7, score: 140 }, { partner: "Oracle · OCI + Fusion Applications" }),
       c("INFRA", "One slide: PlatformDIGITAL® foundation", "Colocation + ServiceFabric® interconnection (a secure 'data meeting place' for clouds, partners and AI workloads): private, connected foundations. The board nods. Slowly. Then all at once.", { stress: -5, risk: -9, cost: 4, confidence: 11, chill: 8, time: 7, score: 135 }, { partner: "Digital Realty · PlatformDIGITAL® + ServiceFabric®" }),
       c("NETWORK", "One slide. It just says 'AI' very large", "Artistic. The board blinks first. Probably.", { stress: -11, chill: -4, score: 30 }, { delayed: { afterSec: 20, text: "GONG! The board asked a follow-up question. There was no slide 2.", sfx: "GONG!", fx: { stress: 15, risk: 6, cost: 3, confidence: -14, chill: -9 } } }),
+    ],
+  },
+  {
+    id: "fabric-mcp", person: "Nadia", dept: "Networks", emoji: "🧶", title: "“An AI agent wants to rewire our network itself!”", severity: 2,
+    body: "Nadia's agent can configure interconnection through a ServiceFabric MCP server. It has already drawn a diagram. The diagram has arrows. So many arrows. (Card inspired by Token Quest's ServiceFabric MCP option.)",
+    choices: [
+      c("NETWORK", "ServiceFabric MCP — agent proposes, human approves", "Token Quest's model: the agent states intent via Digital Realty's early-access ServiceFabric MCP server, you approve or edit the exact priced config, then 10G/100G ports and minutes-fast virtual connections do the rest. Same wire, faster admin, human hand on the wheel.", { stress: -6, risk: -10, cost: 4, confidence: 9, chill: 8, time: 6, score: 135 }, { partner: "Digital Realty · ServiceFabric® MCP (early access)" }),
+      c("INFRA", "Same building? Just Cross Connect it", "A physical cable between two endpoints in one Digital Realty facility: nothing to configure, 100G-class, and it physically cannot leave the building. Boring. Beautiful.", { stress: -5, risk: -9, cost: 4, confidence: 7, chill: 7, time: 5, score: 115 }, { partner: "Digital Realty · Cross Connect" }),
+      c("SOFTWARE", "Give the agent write access & a coffee", "It feels empowered. It has ordered bandwidth to the Moon (low latency to the Moon pending).", { stress: -11, risk: 8, cost: 6, chill: -4, score: 25 }, { delayed: { afterSec: 16, text: "BZZT! The agent right-sized everyone's bandwidth — to 50 Mbps. Including the CEO's video call. Froze mid-blink.", sfx: "BZZT!", fx: { stress: 15, risk: 12, cost: 9, confidence: -11, chill: -8 } } }),
+    ],
+  },
+  {
+    id: "metro-choice", person: "Priya", dept: "Finance Ops", emoji: "🗺️", title: "“Why is the AI hall quote different in every city?!”", severity: 1,
+    body: "London power is tight and pricey, other metros have bigger power blocks going cheaper. Priya has a spreadsheet and strong opinions. (Scenario style borrowed from Token Quest's metro power ladders.)",
+    choices: [
+      c("INFRA", "Match racks to metros like Token Quest", "Real PlatformDIGITAL® metros, different power blocks per city: scarce-power metros for the latency-critical bits, roomier cheaper-power metros for batch. Physics (about 5 µs/km in fibre) sets the speed limit, not the brochure.", { stress: -5, risk: -6, cost: -7, confidence: 9, chill: 8, time: 6, score: 125 }, { partner: "Digital Realty · PlatformDIGITAL® metros" }),
+      c("NETWORK", "Two metros + ServiceFabric® between them", "Split London/Frankfurt-style: inter-site private links only where a second metro earns its keep.", { stress: -4, risk: -7, cost: 3, confidence: 8, chill: 7, time: 5, score: 110 }, { partner: "Digital Realty · ServiceFabric® metro links" }),
+      c("SOFTWARE", "Pick whichever city is trending", "Decisions by vibes! The latency will also be vibes.", { stress: -9, chill: -3, score: 25 }, { delayed: { afterSec: 18, text: "WHIRR! Users on the other continent describe the app as 'meditative'.", sfx: "WHIRR!", fx: { stress: 12, risk: 5, cost: 6, confidence: -10, chill: -7 } } }),
     ],
   },
   // ---- Follow-up consequence cards (spawned by tempting choices) ----

@@ -34,10 +34,17 @@ or comes back escalated, with stress/risk up (serious 🚨 requests only wander
 4 short panels (~2 minutes to read, auto-advancing); hit
 **START THE MADNESS!** to begin instantly.
 
-> Token Quest note: the user-provided site
-> (tokenquest.tokenquest.workers.dev) is behind a team password login, so its
-> internal examples could not be read without a credential (none was
-> available; no guessing attempted). Digital Realty choices therefore use
-> Digital Realty's public PlatformDIGITAL® / ServiceFabric® offerings —
-> send the team password and the choices can be revised against the site's
-> actual examples.
+> Token Quest credit: Digital Realty choices were mined from **Token Quest**
+> — [punkrockquantum/JRRToken](https://github.com/punkrockquantum/JRRToken/tree/cursor/token-quest-datacenter-game)
+> (branch `cursor/token-quest-datacenter-game`, esp. `js/data.js` and
+> `js/network.js`, whose headers separate published Digital Realty facts from
+> labelled game assumptions). Borrowed: ServiceFabric port/Link/Connection
+> specifics (10G/100G ports, L2 Links & L3 Connections from 50 Mbps to
+> 100 Gbps, cloud on-ramps incl. Oracle Cloud, Service Directory partners,
+> other metros, Digital Internet, ~15-day new-port cross-connect SLA vs
+> minutes-fast virtual connections), Cross Connects, the early-access
+> ServiceFabric MCP agent-configuration option (new "fabric-mcp" card),
+> London direct-to-chip liquid cooling at 150 kW/rack+ for liquid-only
+> rack-scale GPUs, metro power-ladder placement (new "metro-choice" card),
+> and fibre physics (~5 µs/km). The password-gated
+> tokenquest.tokenquest.workers.dev site was not used — the repo is the source.

@@ -63,6 +63,16 @@ describe("card deck", () => {
     }
     expect(cardById("john-chatgpt")!.choices.some((x) => x.delayed?.followUpId === "legal-fallout")).toBe(true);
   });
+  it("Digital Realty choices carry Token Quest-mined specifics", () => {
+    const all = CARDS.flatMap((x) => x.choices.map((y) => `${y.label} ${y.detail} ${y.partner ?? ""}`)).join(" ");
+    // From punkrockquantum/JRRToken (cursor/token-quest-datacenter-game): js/data.js + js/network.js published-facts headers
+    expect(all).toContain("ServiceFabric MCP");
+    expect(all).toContain("Cross Connect");
+    expect(all).toContain("150 kW");
+    expect(all).toContain("50 Mbps–100 Gbps");
+    expect(cardById("fabric-mcp")).toBeTruthy();
+    expect(cardById("metro-choice")).toBeTruthy();
+  });
   it("partner choices name Digital Realty / Oracle / OEM options", () => {
     const partners = CARDS.flatMap((x) => x.choices.map((y) => y.partner ?? "")).join(" ");
     expect(partners).toContain("Digital Realty"); expect(partners).toContain("Oracle"); expect(partners).toContain("OEM");
