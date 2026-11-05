@@ -52,3 +52,9 @@ h1.logo{font-size:clamp(38px,7vw,72px);margin:0;line-height:.95;-webkit-text-str
 .floatfx{font-weight:900;font-size:15px}
 .end{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}.end-box{max-width:680px;text-align:center;padding:30px}
 .log{font-size:13px;max-height:120px;overflow:auto;text-align:left;background:#fff;border:3px solid var(--ink);border-radius:10px;padding:8px 12px;margin-top:10px}
+.loiter{display:flex;gap:10px;align-items:center;margin-top:12px;background:#dff3ff;border:3px dashed var(--ink);border-radius:12px;padding:10px 12px;box-shadow:4px 4px 0 var(--ink);animation:wob .5s ease-in-out infinite alternate}
+.loiter-face{font-size:38px}
+.foot{display:inline-block;animation:tap .28s ease-in-out infinite alternate}
+@keyframes tap{from{transform:rotate(-18deg) translateY(0)}to{transform:rotate(10deg) translateY(-4px)}}
+.ignorebtn{width:100%;margin-top:12px;text-align:left;padding:13px 15px;background:#ffe9fb;border:3px solid var(--ink);border-radius:12px;box-shadow:4px 4px 0 var(--ink);font-weight:900}
+.ignorebtn:hover{background:#ffd21f;transform:rotate(-.4deg)}

@@ -40,6 +40,23 @@ export function dueEvents(queue: Scheduled[], elapsed: number): { due: Scheduled
 export function spawnInterval(elapsed: number): number {
   return Math.max(2.1, 6 - elapsed * 0.045);
 }
+/* ---- Ignore mechanic: walk away and hope they get bored ---- */
+export type Severity = 1 | 2 | 3; // 1 = silly/low-stakes, 3 = serious
+export const IGNORE_DELAY_SEC = 3;
+/** Chance the requester gets bored and wanders off. Silly requests are safe to ignore; serious ones are not. */
+export function ignoreWanderChance(severity: Severity): number {
+  return severity === 1 ? 0.85 : severity === 2 ? 0.55 : 0.25;
+}
+export interface IgnoreResult { outcome: "wander" | "escalate"; fx: Partial<Effects>; sfx: string }
+export function resolveIgnore(severity: Severity, rng: number): IgnoreResult {
+  if (rng < ignoreWanderChance(severity)) {
+    return { outcome: "wander", sfx: "BORED…", fx: { stress: -3, risk: severity === 3 ? 2 : 0, chill: 3, confidence: 1, score: 40 } };
+  }
+  return {
+    outcome: "escalate", sfx: "UH OH!",
+    fx: { stress: 6 + severity * 4, risk: 3 + severity * 3, cost: severity * 2, confidence: -2 - severity * 2, chill: -5, score: 0 },
+  };
+}
 export function qualityOf(fx: Partial<Effects>): "good" | "bad" | "mixed" {
   const chaos = (fx.stress ?? 0) + (fx.risk ?? 0) + (fx.cost ?? 0) - (fx.confidence ?? 0) - (fx.chill ?? 0);
   if (chaos <= -8) return "good";

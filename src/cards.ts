@@ -8,22 +8,27 @@ export interface Choice {
 }
 export interface GameCard {
   id: string; person: string; dept: string; emoji: string; title: string; body: string; followUp?: boolean;
+  /** 1 = silly/low-stakes (fairly safe to Ignore), 2 = medium, 3 = serious (Ignore at your peril). Defaults to 2. */
+  severity?: 1 | 2 | 3;
+  /** Card spawned if this one is Ignored and escalates. Defaults to an escalated clone. */
+  escalatesTo?: string;
   choices: [Choice, Choice, Choice];
 }
+export const severityOf = (card: GameCard): 1 | 2 | 3 => card.severity ?? 2;
 const c = (lane: Lane, label: string, detail: string, fx: Partial<Effects>, extra: Partial<Choice> = {}): Choice => ({ lane, label, detail, fx, ...extra });
 
 export const CARDS: GameCard[] = [
   {
-    id: "john-chatgpt", person: "John", dept: "Marketing", emoji: "🤠", title: "“I uploaded ALL customer data to ChatGPT!”",
+    id: "john-chatgpt", severity: 3, escalatesTo: "legal-fallout", person: "John", dept: "Marketing", emoji: "🤠", title: "“I uploaded ALL customer data to ChatGPT!”",
     body: "John needed a PowerPoint. John used the entire customer database as… inspiration. The deck does look great, to be fair.",
     choices: [
       c("SOFTWARE", "Quarantine & train, don't ban", "Approved AI workspace, DLP rules, John presents on data hygiene (in Comic Sans, as penance).", { stress: -6, risk: -12, cost: 3, confidence: 6, chill: 8, time: 6, score: 120 }),
       c("NETWORK", "YOLO — let the deck ship!", "Instant relief! Nobody asks questions. Yet.", { stress: -12, risk: 6, cost: -4, confidence: 2, chill: -4, time: 2, score: 30 }, { delayed: { afterSec: 18, text: "WHAM! A customer recognises their own account number on slide 14. Legal would like a word…", sfx: "WHAM!", fx: { stress: 16, risk: 20, cost: 8, confidence: -12, chill: -10 }, followUpId: "legal-fallout" } }),
-      c("INFRA", "Move AI workloads somewhere private", "Digital Realty colocation on PlatformDIGITAL® — data stays in your cage, AI comes to it.", { stress: -4, risk: -10, cost: 6, confidence: 8, chill: 7, time: 5, score: 110 }, { partner: "Digital Realty · PlatformDIGITAL® colocation" }),
+      c("INFRA", "Move AI workloads somewhere private", "Digital Realty colocation on PlatformDIGITAL® — customer data stays in your cage under your keys, and the AI runs next to it instead of data flying out to a public chatbot.", { stress: -4, risk: -10, cost: 6, confidence: 8, chill: 7, time: 5, score: 110 }, { partner: "Digital Realty · PlatformDIGITAL® colocation" }),
     ],
   },
   {
-    id: "charles-payroll", person: "Charles", dept: "Finance", emoji: "🧐", title: "“Automate payroll with this SAP plugin I found!”",
+    id: "charles-payroll", severity: 3, escalatesTo: "payroll-chaos", person: "Charles", dept: "Finance", emoji: "🧐", title: "“Automate payroll with this SAP plugin I found!”",
     body: "The plugin has 5 stars, 3 reviews, and a logo that is almost — but not quite — SAP's.",
     choices: [
       c("SOFTWARE", "Pilot proper enterprise apps", "Oracle Fusion Cloud Applications (ERP/HCM) on OCI — payroll with actual governance and human approval.", { stress: -5, risk: -11, cost: 5, confidence: 9, chill: 8, time: 6, score: 120 }, { partner: "Oracle · Fusion Applications on OCI" }),
@@ -32,16 +37,16 @@ export const CARDS: GameCard[] = [
     ],
   },
   {
-    id: "fred-mythos", person: "Fred", dept: "Security", emoji: "🦸", title: "“Improve security using… Mythos!”",
+    id: "fred-mythos", severity: 2, person: "Fred", dept: "Security", emoji: "🦸", title: "“Improve security using… Mythos!”",
     body: "Fred read a forum. Fred is now invincible. Fred has forwarded you 47 links and a cape.",
     choices: [
       c("SOFTWARE", "Real threat model, boring heroes", "Patch cadence, MFA everywhere, tested backups. Capes optional.", { stress: -5, risk: -13, cost: 4, confidence: 7, chill: 8, time: 5, score: 120 }),
-      c("NETWORK", "Private connectivity, less public exposure", "Digital Realty ServiceFabric® private interconnection instead of shouting over the public internet.", { stress: -4, risk: -11, cost: 5, confidence: 7, chill: 7, time: 5, score: 110 }, { partner: "Digital Realty · ServiceFabric®" }),
+      c("NETWORK", "Private connectivity, less public exposure", "Digital Realty ServiceFabric®: one multi-service port, private virtual connections to clouds & partners picked from the Service Directory — instead of shouting over the public internet.", { stress: -4, risk: -11, cost: 5, confidence: 7, chill: 7, time: 5, score: 110 }, { partner: "Digital Realty · ServiceFabric®" }),
       c("INFRA", "Give Fred the Mythos budget", "He feels GREAT. The auditors will not.", { stress: -10, risk: 8, cost: 10, chill: -4, score: 25 }, { delayed: { afterSec: 22, text: "BOOM! 'Mythos' turned out to be a screensaver. A very secure-feeling screensaver.", sfx: "BOOM!", fx: { stress: 14, risk: 18, cost: 10, confidence: -10, chill: -8 } } }),
     ],
   },
   {
-    id: "sam-hnw", person: "Sam", dept: "Product", emoji: "💎", title: "“New product for high-net-worth clients!”",
+    id: "sam-hnw", severity: 1, person: "Sam", dept: "Product", emoji: "💎", title: "“New product for high-net-worth clients!”",
     body: "Sam wants an AI concierge for very rich customers. It must be exclusive, instant, and 'basically telepathic'.",
     choices: [
       c("SOFTWARE", "Build it on governed AI services", "OCI AI services + Autonomous Database — rich data, richer controls, consent baked in.", { stress: -4, risk: -9, cost: 6, confidence: 10, chill: 8, time: 6, score: 130 }, { partner: "Oracle · OCI AI + Autonomous Database" }),
@@ -50,7 +55,7 @@ export const CARDS: GameCard[] = [
     ],
   },
   {
-    id: "alan-bitcoin", person: "Alan", dept: "Treasury", emoji: "🚀", title: "“Copilot found me Bitcoin strategies!”",
+    id: "alan-bitcoin", severity: 2, person: "Alan", dept: "Treasury", emoji: "🚀", title: "“Copilot found me Bitcoin strategies!”",
     body: "Alan's Copilot has a 14-tab spreadsheet, three rocket emojis, and absolutely no risk warnings.",
     choices: [
       c("SOFTWARE", "Sanctioned analytics sandbox", "Approved models, treasury policy limits, no bank funds near meme coins.", { stress: -6, risk: -12, cost: 3, confidence: 7, chill: 8, time: 5, score: 120 }),
@@ -59,7 +64,7 @@ export const CARDS: GameCard[] = [
     ],
   },
   {
-    id: "copilot-bill", person: "Priya", dept: "Finance Ops", emoji: "🧾", title: "“The Copilot bill just did WHAT?!”",
+    id: "copilot-bill", severity: 2, person: "Priya", dept: "Finance Ops", emoji: "🧾", title: "“The Copilot bill just did WHAT?!”",
     body: "Every employee, every Copilot, all day, mostly asking it to write poems about expense reports. Costs are doing parkour.",
     choices: [
       c("SOFTWARE", "Right-size licences + usage dashboards", "Keep AI for power users, coach the poets, cap the chaos.", { stress: -6, risk: -4, cost: -14, confidence: 8, chill: 9, time: 6, score: 130 }),
@@ -68,16 +73,16 @@ export const CARDS: GameCard[] = [
     ],
   },
   {
-    id: "branch-wifi", person: "Marta", dept: "Branches", emoji: "📶", title: "“Branch Wi-Fi died during the lunch rush!”",
+    id: "branch-wifi", severity: 2, person: "Marta", dept: "Branches", emoji: "📶", title: "“Branch Wi-Fi died during the lunch rush!”",
     body: "Forty branches, one router each, zero mercy. Customers are paying by interpretive dance.",
     choices: [
-      c("NETWORK", "Dual links + ServiceFabric® backbone", "Private interconnection between branches, clouds and partners — lunch rush-proof.", { stress: -9, risk: -8, cost: 6, confidence: 8, chill: 8, time: 6, score: 120 }, { partner: "Digital Realty · ServiceFabric®" }),
+      c("NETWORK", "Dual links + ServiceFabric® backbone", "ServiceFabric® virtual connections between branches, clouds and partners, provisioned on demand — turn up a private link instead of filing a 6-week circuit order. Lunch rush-proof.", { stress: -9, risk: -8, cost: 6, confidence: 8, chill: 8, time: 6, score: 120 }, { partner: "Digital Realty · ServiceFabric®" }),
       c("INFRA", "OEM swap: proper kit, spares on shelf", "Validated OEM-partner routers, configured before they ship.", { stress: -7, risk: -6, cost: 5, confidence: 6, chill: 6, time: 5, score: 100 }, { partner: "OEM partner · branch kit" }),
       c("SOFTWARE", "Tell branches to 'try turning it off and on'", "It works! In one branch. The other 39 are now off.", { stress: -10, chill: -4, score: 25 }, { delayed: { afterSec: 14, text: "ZONK! Branch bingo: nobody knows which router belongs to whom anymore.", sfx: "ZONK!", fx: { stress: 15, risk: 6, cost: 5, confidence: -10, chill: -8 } } }),
     ],
   },
   {
-    id: "data-mess", person: "Olu", dept: "Data Team", emoji: "🗄️", title: "“Our data is in 900 spreadsheets!”",
+    id: "data-mess", severity: 2, person: "Olu", dept: "Data Team", emoji: "🗄️", title: "“Our data is in 900 spreadsheets!”",
     body: "One of them is called FINAL_v27_REAL(2).xlsx. It is load-bearing.",
     choices: [
       c("SOFTWARE", "Autonomous Database, one source of truth", "Oracle Autonomous Database — self-tuning, governed, spreadsheet retirement home included.", { stress: -6, risk: -9, cost: 5, confidence: 9, chill: 9, time: 6, score: 130 }, { partner: "Oracle · Autonomous Database" }),
@@ -86,7 +91,7 @@ export const CARDS: GameCard[] = [
     ],
   },
   {
-    id: "ai-agents", person: "Greta", dept: "HR", emoji: "🤖", title: "“Can an AI agent do our onboarding?”",
+    id: "ai-agents", severity: 1, person: "Greta", dept: "HR", emoji: "🤖", title: "“Can an AI agent do our onboarding?”",
     body: "Greta wants new joiners welcomed, equipped and trained by an agent. She has named it already. It's called Greg.",
     choices: [
       c("SOFTWARE", "Greg, but with guardrails", "Oracle Fusion HCM workflows + OCI AI agents with human approval for the sensitive bits.", { stress: -5, risk: -9, cost: 5, confidence: 9, chill: 8, time: 6, score: 130 }, { partner: "Oracle · Fusion HCM + OCI AI" }),
@@ -95,7 +100,7 @@ export const CARDS: GameCard[] = [
     ],
   },
   {
-    id: "ceo-demo", person: "The CEO", dept: "Executive", emoji: "👔", title: "“Demo AI to the board. Tomorrow. Live.”",
+    id: "ceo-demo", severity: 2, person: "The CEO", dept: "Executive", emoji: "👔", title: "“Demo AI to the board. Tomorrow. Live.”",
     body: "The CEO wants live AI, on the big screen, with the bank's real data. Tomorrow. He said 'what's the worst that could happen' out loud.",
     choices: [
       c("INFRA", "Stage it in colocation, rehearse tonight", "PlatformDIGITAL® cage, frozen demo data, two rehearsals and a big red BACKUP VIDEO button.", { stress: -7, risk: -11, cost: 5, confidence: 11, chill: 9, time: 6, score: 140 }, { partner: "Digital Realty · PlatformDIGITAL®" }),
@@ -104,7 +109,7 @@ export const CARDS: GameCard[] = [
     ],
   },
   {
-    id: "ransom-note", person: "Night Shift", dept: "SOC", emoji: "🌙", title: "“Something's encrypting the file server…”",
+    id: "ransom-note", severity: 3, person: "Night Shift", dept: "SOC", emoji: "🌙", title: "“Something's encrypting the file server…”",
     body: "It's 2 a.m. The file server is renaming things to .oops and the backup tape drive is making a smell.",
     choices: [
       c("INFRA", "Isolate, restore from colo backups", "Segment at the cage, restore clean copies, coffee for the SOC.", { stress: -8, risk: -14, cost: 6, confidence: 8, chill: 9, time: 6, score: 140 }, { partner: "Digital Realty · colocation + DR" }),
@@ -113,7 +118,7 @@ export const CARDS: GameCard[] = [
     ],
   },
   {
-    id: "app-slow", person: "Dev", dept: "Engineering", emoji: "🐌", title: "“The banking app takes 19 seconds to log in!”",
+    id: "app-slow", severity: 2, person: "Dev", dept: "Engineering", emoji: "🐌", title: "“The banking app takes 19 seconds to log in!”",
     body: "Users think the spinner is a loading game. Someone reached level 40.",
     choices: [
       c("INFRA", "Move hot workloads onto OCI", "OCI compute + Autonomous Database near the users. Spinner retires.", { stress: -7, risk: -5, cost: 6, confidence: 9, chill: 8, time: 6, score: 120 }, { partner: "Oracle · OCI" }),
@@ -122,7 +127,7 @@ export const CARDS: GameCard[] = [
     ],
   },
   {
-    id: "shadow-ai", person: "Ingrid", dept: "Audit", emoji: "🕵️", title: "“We found 63 secret AI tools in use.”",
+    id: "shadow-ai", severity: 2, person: "Ingrid", dept: "Audit", emoji: "🕵️", title: "“We found 63 secret AI tools in use.”",
     body: "Sixty-three. Including one that writes apology emails and one that only makes haikus about liquidity.",
     choices: [
       c("SOFTWARE", "Amnesty + approved AI catalogue", "Keep the useful, kill the risky, licence the haiku one for morale.", { stress: -5, risk: -13, cost: 2, confidence: 8, chill: 9, time: 6, score: 130 }),
@@ -131,7 +136,7 @@ export const CARDS: GameCard[] = [
     ],
   },
   {
-    id: "gpu-queue", person: "Ken", dept: "Risk Modelling", emoji: "🎰", title: "“We need GPUs. All of them. By Friday.”",
+    id: "gpu-queue", severity: 1, person: "Ken", dept: "Risk Modelling", emoji: "🎰", title: "“We need GPUs. All of them. By Friday.”",
     body: "Ken's risk models take 9 hours. Ken has tried asking them nicely to hurry up.",
     choices: [
       c("INFRA", "High-density colocation for AI", "Digital Realty high-density colo built for power-hungry AI kit, without rebuilding your own hall.", { stress: -6, risk: -6, cost: 7, confidence: 9, chill: 8, time: 6, score: 125 }, { partner: "Digital Realty · high-density colocation" }),
@@ -140,7 +145,7 @@ export const CARDS: GameCard[] = [
     ],
   },
   {
-    id: "vendor-lockin", person: "Legal", dept: "Procurement", emoji: "⛓️", title: "“This contract auto-renews for 99 years?!”",
+    id: "vendor-lockin", severity: 2, person: "Legal", dept: "Procurement", emoji: "⛓️", title: "“This contract auto-renews for 99 years?!”",
     body: "Page 214. Tiny font. The vendor's pen is already out and it is, legally, a sword.",
     choices: [
       c("NETWORK", "Open interconnection, no lock-in", "ServiceFabric® connects clouds & partners without betting the bank on one vendor's fabric.", { stress: -5, risk: -10, cost: -6, confidence: 8, chill: 8, time: 6, score: 125 }, { partner: "Digital Realty · ServiceFabric®" }),
@@ -149,7 +154,7 @@ export const CARDS: GameCard[] = [
     ],
   },
   {
-    id: "phish", person: "Everyone", dept: "All Staff", emoji: "🎣", title: "“Half the bank clicked a fake 'Free Pizza' email!”",
+    id: "phish", severity: 3, person: "Everyone", dept: "All Staff", emoji: "🎣", title: "“Half the bank clicked a fake 'Free Pizza' email!”",
     body: "The pizza was a lie. The credential harvest was extremely real. Extra toppings: malware.",
     choices: [
       c("SOFTWARE", "Training + phishing-resistant MFA", "No blame, better armour, and actual pizza on Friday.", { stress: -6, risk: -13, cost: 3, confidence: 7, chill: 9, time: 6, score: 130 }),
@@ -158,17 +163,17 @@ export const CARDS: GameCard[] = [
     ],
   },
   {
-    id: "board-ai", person: "Board", dept: "Governance", emoji: "🏛️", title: "“Show us the AI strategy. In one slide.”",
+    id: "board-ai", severity: 2, person: "Board", dept: "Governance", emoji: "🏛️", title: "“Show us the AI strategy. In one slide.”",
     body: "One slide. They fear neither God nor bullet points. Currently the strategy is 'Copilot and vibes'.",
     choices: [
       c("SOFTWARE", "One slide: Oracle AI stack, governed", "OCI + Fusion + Autonomous Database: AI embedded in workflows, approvals human.", { stress: -5, risk: -9, cost: 4, confidence: 12, chill: 9, time: 7, score: 140 }, { partner: "Oracle · OCI + Fusion Applications" }),
-      c("INFRA", "One slide: PlatformDIGITAL® foundation", "Colocation + ServiceFabric® interconnection: private, connected data foundations for AI.", { stress: -5, risk: -9, cost: 4, confidence: 11, chill: 8, time: 7, score: 135 }, { partner: "Digital Realty · PlatformDIGITAL®" }),
+      c("INFRA", "One slide: PlatformDIGITAL® foundation", "Colocation + ServiceFabric® interconnection (a secure 'data meeting place' for clouds, partners and AI workloads): private, connected foundations. The board nods. Slowly. Then all at once.", { stress: -5, risk: -9, cost: 4, confidence: 11, chill: 8, time: 7, score: 135 }, { partner: "Digital Realty · PlatformDIGITAL® + ServiceFabric®" }),
       c("NETWORK", "One slide. It just says 'AI' very large", "Artistic. The board blinks first. Probably.", { stress: -11, chill: -4, score: 30 }, { delayed: { afterSec: 20, text: "GONG! The board asked a follow-up question. There was no slide 2.", sfx: "GONG!", fx: { stress: 15, risk: 6, cost: 3, confidence: -14, chill: -9 } } }),
     ],
   },
   // ---- Follow-up consequence cards (spawned by tempting choices) ----
   {
-    id: "legal-fallout", person: "Legal", dept: "Legal", emoji: "⚖️", title: "FOLLOW-UP: “About that PowerPoint…”", followUp: true,
+    id: "legal-fallout", severity: 3, person: "Legal", dept: "Legal", emoji: "⚖️", title: "FOLLOW-UP: “About that PowerPoint…”", followUp: true,
     body: "The ChatGPT deck is now Exhibit A. Regulators want a data-handling story by Monday.",
     choices: [
       c("SOFTWARE", "Full audit + approved AI rollout", "Own it, fix it, document it. Expensive in pride, cheap in fines.", { stress: -4, risk: -15, cost: 7, confidence: 8, chill: 7, time: 5, score: 120 }),
@@ -177,7 +182,7 @@ export const CARDS: GameCard[] = [
     ],
   },
   {
-    id: "payroll-chaos", person: "Everyone", dept: "Payroll", emoji: "💸", title: "FOLLOW-UP: “WHY WAS I PAID IN BUTTONS?”", followUp: true,
+    id: "payroll-chaos", severity: 3, person: "Everyone", dept: "Payroll", emoji: "💸", title: "FOLLOW-UP: “WHY WAS I PAID IN BUTTONS?”", followUp: true,
     body: "Double pay, missing pay, and one executive paid entirely in what the plugin calls 'exposure'.",
     choices: [
       c("SOFTWARE", "Emergency move to Fusion HCM payroll", "Oracle Fusion HCM on OCI, reconciled by humans who are paid correctly first.", { stress: -6, risk: -12, cost: 8, confidence: 10, chill: 8, time: 6, score: 130 }, { partner: "Oracle · Fusion HCM" }),
@@ -187,3 +192,12 @@ export const CARDS: GameCard[] = [
   },
 ];
 export const cardById = (id: string) => CARDS.find((x) => x.id === id);
+/** What an ignored card comes back as when it gets worse instead of bored. */
+export function escalatedClone(card: GameCard): GameCard {
+  if (card.escalatesTo) return cardById(card.escalatesTo) ?? card;
+  return {
+    ...card, id: `${card.id}-escalated`, followUp: true, severity: 3,
+    title: `ESCALATED: ${card.title}`,
+    body: `${card.body} You ignored it. It went away, thought about its life, and came back BIGGER — with friends and a meeting invite.`,
+  };
+}
