@@ -77,10 +77,10 @@ function cioSVG(stage: number): string {
 
 /* ---------- Intro: punchy, staged, skippable (full read ≈ 2 min) ---------- */
 const SLIDES = [
-  { h: "📟 THE BACKSTORY", t: `You are the <b>CIO of a Very Serious Bank</b>. It is Monday. It is 8:59 a.m. Every department has discovered AI at the same time.<br><br>John from Marketing has uploaded <b>all customer data to ChatGPT</b> to make a PowerPoint. Charles wants payroll automated by a mystery SAP plugin. Fred has a “security plan” involving a magic amulet, three firewalls drawn in crayon, and a cape. Sam is pitching AI concierges to billionaires. Alan is day-trading Bitcoin on Copilot's advice.<br><br>All of it runs on Copilot. All of it costs a fortune. <b>None of it is governed.</b>` },
-  { h: "🎯 THE MISSION", t: `Survive the onslaught of request &amp; incident cards. Keep <b>Stress, Risk and Cost</b> below 100, keep <b>Board Confidence</b> above zero, and fill your <b>Chill meter</b> to reach RELAXATION — Hawaiian shirt, shorts, sunglasses, beach.<br><br>Good calls extend your timer and calm the bank. Reach <b>100 Chill</b> for instant beach mode, or survive to the final whistle with the bank intact.` },
+  { h: "📟 THE BACKSTORY", t: `You are the <b>CIO of a Very Serious Company</b>. It is Monday. It is 8:59 a.m. Every department has discovered AI at the same time.<br><br>John from Marketing has uploaded <b>all customer data to ChatGPT</b> to make a PowerPoint. Charles wants payroll automated by a mystery SAP plugin. Fred has a “security plan” involving a magic amulet, three firewalls drawn in crayon, and a cape. Sam is pitching AI concierges to billionaires. Alan is day-trading Bitcoin on Copilot's advice.<br><br>All of it runs on Copilot. All of it costs a fortune. <b>None of it is governed.</b>` },
+  { h: "🎯 THE MISSION", t: `Survive the onslaught of request &amp; incident cards. Keep <b>Stress, Risk and Cost</b> below 100, keep <b>Board Confidence</b> above zero, and fill your <b>Chill meter</b> to reach RELAXATION — Hawaiian shirt, shorts, sunglasses, beach.<br><br>Good calls extend your timer and calm the company. Reach <b>100 Chill</b> for instant beach mode, or survive to the final whistle with the company intact.` },
   { h: "⚠️ THE TRAP (READ THIS!)", t: `Every card offers 3 strategies — <span class="kbd">INFRA</span> <span class="kbd">NETWORK</span> <span class="kbd">SOFTWARE</span>. The tempting quick win feels AMAZING now: stress melts, everyone's happy…<br><br>…then, 15–25 seconds later: <b>WHAM!</b> The consequence lands — worse than the original problem, often spawning a FOLLOW-UP card. Real CIOs play the long game. So should you.<br><br>Or hit <b>IGNORE</b> (<span class="kbd">0</span>): the requester loiters by your desk, relaxed, foot tapping… 3 seconds later they either get <b>BORED</b> and wander off (free win!) or come back <b>WORSE, with friends</b>. Ignoring 🤪 silly requests is often smart. Ignoring 🚨 serious ones is how sequels happen.<br><br>Your face will tell the story: wild hair &amp; bloodshot eyes when it's bad; smoothie &amp; sunglasses when you win.` },
-  { h: "🤝 YOUR PARTNERS", t: `<b>Digital Realty</b> — colocation on PlatformDIGITAL®, high-density AI-ready halls, and ServiceFabric® private interconnection to clouds &amp; partners instead of the wild public internet.<br><b>Oracle</b> — Oracle Cloud Infrastructure (OCI), Autonomous Database, Fusion Applications (ERP/HCM) and OCI AI services: enterprise AI with governance and human approval.<br><b>OEM partners</b> — validated servers &amp; branch kit that arrive configured, not cursed.<br><br>Partner choices are usually the grown-up, long-game move. Click a card, then pick <span class="kbd">1</span> <span class="kbd">2</span> <span class="kbd">3</span> — or just tap. <b>GOOD LUCK. YOU'LL NEED IT.</b>` },
+  { h: "🤝 YOUR PARTNERS", t: `<b>Colocation partners</b> — private data halls, high-density AI-ready racks, and private interconnection to clouds &amp; partners instead of the wild public internet.<br><b>Cloud &amp; enterprise software partners</b> — cloud infrastructure, managed databases, enterprise apps (ERP/HR) and AI services: powerful tools with governance and human approval.<br><b>OEM partners</b> — validated servers &amp; branch kit that arrive configured, not cursed.<br><br>Partner choices are usually the grown-up, long-game move. Click a card, then pick <span class="kbd">1</span> <span class="kbd">2</span> <span class="kbd">3</span> — or just tap. <b>GOOD LUCK. YOU'LL NEED IT.</b>` },
 ];
 let slide = 0; let slideTimer: number | undefined;
 function renderIntro() {
@@ -88,7 +88,7 @@ function renderIntro() {
   slideTimer = window.setInterval(() => { if (slide < SLIDES.length - 1) { slide++; renderIntro(); } }, 30000);
   app.innerHTML = `<div id="intro"><div class="panel intro-box">
     <h1 class="logo">CIO<br>SIMULATOR!</h1>
-    <p class="sub">💥 Survive the bank. Calm the chaos. Reach the beach. 💥</p>
+    <p class="sub">💥 Survive the company. Calm the chaos. Reach the beach. 💥</p>
     <div class="slide"><h2>${SLIDES[slide].h}</h2><p>${SLIDES[slide].t}</p></div>
     <div class="dots">${SLIDES.map((_, i) => `<i class="${i === slide ? "on" : ""}"></i>`).join("")}</div>
     <p><button class="ghost" id="prev" ${slide === 0 ? "disabled" : ""}>◀ Back</button>
@@ -141,7 +141,7 @@ function tick() {
   if (elapsed - heatClock >= 25) { heatClock = elapsed; if (ignoreHeat > 0) { ignoreHeat--; needsRender = true; } }
   if (elapsed - lastSpawn >= spawnInterval(elapsed)) {
     lastSpawn = elapsed; spawn();
-    if (Math.random() < doubleSpawnChance(elapsed)) { spawn(); burst("DOUBLE REQUEST!"); log.unshift(`🌶️ INTENSITY Lv.${pressureLevel(elapsed)} — TWO requests at once! The bank has discovered urgency!`); }
+    if (Math.random() < doubleSpawnChance(elapsed)) { spawn(); burst("DOUBLE REQUEST!"); log.unshift(`🌶️ INTENSITY Lv.${pressureLevel(elapsed)} — TWO requests at once! The company has discovered urgency!`); }
   }
   const { due, pending } = dueEvents(consequences, elapsed); consequences = pending;
   for (const ev of due) {
@@ -175,11 +175,11 @@ function tick() {
 function checkEnd() {
   const reason = isGameOver(meters);
   if (reason) return end(false, reason);
-  if (meters.chill >= 100) return end(true, "CHILL HIT 100! You didn't just survive the bank — you tamed it. Sunglasses on. Out-of-office: FOREVER (well, two weeks).");
+  if (meters.chill >= 100) return end(true, "CHILL HIT 100! You didn't just survive the company — you tamed it. Sunglasses on. Out-of-office: FOREVER (well, two weeks).");
   if (timeLeft <= 0) {
     const st = stageFor(meters);
-    if (st >= 3) return end(true, "THE FINAL WHISTLE! The bank is calm, the board is smiling, and someone is booking you a flight with a little umbrella in the itinerary.");
-    return end(false, "The clock ran out with the bank still wobbling like jelly in an earthquake. So close! The beach remains… theoretical.");
+    if (st >= 3) return end(true, "THE FINAL WHISTLE! The company is calm, the board is smiling, and someone is booking you a flight with a little umbrella in the itinerary.");
+    return end(false, "The clock ran out with the company still wobbling like jelly in an earthquake. So close! The beach remains… theoretical.");
   }
 }
 function ignoreSelected() {

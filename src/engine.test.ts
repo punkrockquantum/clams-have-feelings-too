@@ -8,7 +8,7 @@ describe("engine", () => {
     const m = applyEffects(base, { stress: 999, confidence: -999 });
     expect(m.stress).toBe(100); expect(m.confidence).toBe(0);
   });
-  it("stage improves as the bank calms", () => {
+  it("stage improves as things calm down", () => {
     expect(stageFor({ stress: 95, risk: 95, cost: 95, confidence: 5, chill: 0 })).toBeLessThan(stageFor({ stress: 5, risk: 5, cost: 5, confidence: 95, chill: 95 }));
     expect(stageFor({ stress: 0, risk: 0, cost: 0, confidence: 100, chill: 100 })).toBe(5);
   });
@@ -92,18 +92,22 @@ describe("card deck", () => {
     }
     expect(cardById("john-chatgpt")!.choices.some((x) => x.delayed?.followUpId === "legal-fallout")).toBe(true);
   });
-  it("Digital Realty choices carry Token Quest-mined specifics", () => {
+  it("interconnection choices carry Token Quest-mined specifics (generic form)", () => {
     const all = CARDS.flatMap((x) => x.choices.map((y) => `${y.label} ${y.detail} ${y.partner ?? ""}`)).join(" ");
-    // From punkrockquantum/JRRToken (cursor/token-quest-datacenter-game): js/data.js + js/network.js published-facts headers
-    expect(all).toContain("ServiceFabric MCP");
+    // Specifics mined from punkrockquantum/JRRToken (cursor/token-quest-datacenter-game), reworded generically
+    expect(all).toContain("agent-configuration server");
     expect(all).toContain("Cross Connect");
     expect(all).toContain("150 kW");
     expect(all).toContain("50 Mbps–100 Gbps");
     expect(cardById("fabric-mcp")).toBeTruthy();
     expect(cardById("metro-choice")).toBeTruthy();
   });
-  it("partner choices name Digital Realty / Oracle / OEM options", () => {
+  it("partner choices name generic colocation / cloud / OEM options", () => {
     const partners = CARDS.flatMap((x) => x.choices.map((y) => y.partner ?? "")).join(" ");
-    expect(partners).toContain("Digital Realty"); expect(partners).toContain("Oracle"); expect(partners).toContain("OEM");
+    expect(partners).toContain("Colocation partner"); expect(partners).toContain("Cloud partner"); expect(partners).toContain("OEM");
+  });
+  it("no bank or vendor-brand references anywhere in the deck", () => {
+    const all = CARDS.map((x) => `${x.person} ${x.dept} ${x.title} ${x.body} ${x.choices.map((y) => `${y.label} ${y.detail} ${y.partner ?? ""} ${y.delayed?.text ?? ""}`).join(" ")}`).join(" ");
+    expect(all).not.toMatch(/digital realty|oracle|platformdigital|servicefabric|\boci\b|fusion|\bbank\b|banking/i);
   });
 });
