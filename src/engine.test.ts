@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { applyEffects, calmScore, clicheAt, dueEvents, ignoreWanderChance, IGNORE_DELAY_SEC, isGameOver, IT_CLICHES, qualityOf, resolveIgnore, spawnInterval, stageFor } from "./engine";
+import { applyEffects, calmScore, clicheAt, doubleSpawnChance, dueEvents, ignoreWanderChance, IGNORE_DELAY_SEC, isGameOver, IT_CLICHES, pressureLevel, qualityOf, resolveIgnore, spawnInterval, stageFor } from "./engine";
 import { CARDS, cardById, escalatedClone, severityOf } from "./cards";
 
 const base = { stress: 50, risk: 50, cost: 50, confidence: 50, chill: 50 };
@@ -50,6 +50,24 @@ describe("IT-desk clichés", () => {
     expect(clicheAt(0)).toBe(IT_CLICHES[0]);
     expect(clicheAt(4)).toBe(IT_CLICHES[1]);
     expect(clicheAt(4 * IT_CLICHES.length)).toBe(IT_CLICHES[0]); // wraps around
+  });
+});
+describe("escalating intensity", () => {
+  it("pressure rises over time and spawns accelerate with a floor", () => {
+    expect(pressureLevel(0)).toBe(0); expect(pressureLevel(50)).toBe(2); expect(pressureLevel(999)).toBe(5);
+    expect(spawnInterval(120)).toBeLessThan(spawnInterval(0));
+    expect(spawnInterval(9999)).toBeGreaterThanOrEqual(1.4);
+  });
+  it("double requests only appear once pressure is on", () => {
+    expect(doubleSpawnChance(10)).toBe(0);
+    expect(doubleSpawnChance(75)).toBeGreaterThan(0.2);
+  });
+  it("ignore heat drags wander odds down but never below 5%", () => {
+    expect(ignoreWanderChance(1, 3)).toBeLessThan(ignoreWanderChance(1, 0));
+    expect(ignoreWanderChance(3, 99)).toBe(0.05);
+    // a roll that would wander at zero heat escalates when the heat is on
+    expect(resolveIgnore(2, 0.5, 0).outcome).toBe("wander");
+    expect(resolveIgnore(2, 0.5, 4).outcome).toBe("escalate");
   });
 });
 describe("card deck", () => {

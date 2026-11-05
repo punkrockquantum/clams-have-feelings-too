@@ -1,5 +1,5 @@
 import { CARDS, cardById, escalatedClone, severityOf, type GameCard, type Choice } from "./cards";
-import { applyEffects, clicheAt, dueEvents, ignoreWanderChance, IGNORE_DELAY_SEC, isGameOver, qualityOf, resolveIgnore, spawnInterval, stageFor, STAGE_NAMES, type Meters, type Scheduled } from "./engine";
+import { applyEffects, clicheAt, doubleSpawnChance, dueEvents, ignoreWanderChance, IGNORE_DELAY_SEC, isGameOver, pressureLevel, qualityOf, resolveIgnore, spawnInterval, stageFor, STAGE_NAMES, type Meters, type Scheduled } from "./engine";
 
 const app = document.getElementById("app")!;
 
@@ -109,6 +109,7 @@ let meters: Meters, timeLeft = 75, elapsed = 0, score = 0, combo = 0, bestCombo 
 let inbox: Live[] = [], selectedUid = 0, uidSeq = 1, deck: GameCard[] = [], consequences: Scheduled[] = [];
 let log: string[] = [], over = false, timerId: number | undefined, lastSpawn = 0;
 let needsRender = false, lastRenderedSecond = -1, newestUid = 0;
+let ignoreHeat = 0, heatClock = 0;
 
 function shuffledDeck() { deck = CARDS.filter((x) => !x.followUp).sort(() => Math.random() - 0.5); }
 function spawn(card?: GameCard) {
@@ -121,7 +122,7 @@ function spawn(card?: GameCard) {
 }
 function startGame() {
   meters = { stress: 45, risk: 40, cost: 30, confidence: 55, chill: 20 };
-  timeLeft = 75; elapsed = 0; score = 0; combo = 0; bestCombo = 0; inbox = []; consequences = []; log = ["☎️ The phones begin to ring…"]; over = false; lastSpawn = 0; uidSeq = 1; selectedUid = 0;
+  timeLeft = 75; elapsed = 0; score = 0; combo = 0; bestCombo = 0; inbox = []; consequences = []; log = ["☎️ The phones begin to ring…"]; over = false; lastSpawn = 0; uidSeq = 1; selectedUid = 0; ignoreHeat = 0; heatClock = 0;
   shuffledDeck();
   // Guarantee the five signature incidents appear early
   for (const id of ["john-chatgpt", "charles-payroll", "fred-mythos", "sam-hnw", "alan-bitcoin"]) { const c = cardById(id)!; deck = deck.filter((x) => x.id !== id); deck.push(c); }
@@ -137,7 +138,11 @@ function burst(text: string) {
 function tick() {
   if (over) return;
   const dt = 0.2; elapsed += dt; timeLeft -= dt;
-  if (elapsed - lastSpawn >= spawnInterval(elapsed)) { lastSpawn = elapsed; spawn(); }
+  if (elapsed - heatClock >= 25) { heatClock = elapsed; if (ignoreHeat > 0) { ignoreHeat--; needsRender = true; } }
+  if (elapsed - lastSpawn >= spawnInterval(elapsed)) {
+    lastSpawn = elapsed; spawn();
+    if (Math.random() < doubleSpawnChance(elapsed)) { spawn(); burst("DOUBLE REQUEST!"); log.unshift(`🌶️ INTENSITY Lv.${pressureLevel(elapsed)} — TWO requests at once! The bank has discovered urgency!`); }
+  }
   const { due, pending } = dueEvents(consequences, elapsed); consequences = pending;
   for (const ev of due) {
     needsRender = true;
@@ -149,15 +154,17 @@ function tick() {
     needsRender = true;
     inbox = inbox.filter((x) => x.uid !== live.uid);
     const sev = severityOf(live.card);
-    const r = resolveIgnore(sev, Math.random());
+    const r = resolveIgnore(sev, Math.random(), ignoreHeat);
     meters = applyEffects(meters, r.fx); score += r.fx.score ?? 0; burst(r.sfx);
     if (r.outcome === "wander") {
+      ignoreHeat = Math.max(0, ignoreHeat - 1);
       log.unshift(`🥱 BORED… ${live.card.person} wandered off. Ignoring worked — this time. (+${r.fx.score} pts)`);
     } else {
-      combo = 0;
+      combo = 0; ignoreHeat++;
       log.unshift(`😱 UH OH! Ignoring ${live.card.person} made it WORSE — Stress/Risk up, and it's back, escalated!`);
       spawn(escalatedClone(live.card));
       if (sev === 3) { spawn(); log.unshift("📚 …and it brought MORE requests with it. Classic."); }
+      if (ignoreHeat >= 3) { spawn(); burst("PILE-UP!"); log.unshift(`🔥 IGNORE HEAT ×${ignoreHeat} — word is out that the CIO ignores people. MORE requests pile in to be ignored louder!`); }
     }
   }
   checkEnd();
@@ -179,7 +186,7 @@ function ignoreSelected() {
   if (over) return;
   const live = waiting().find((x) => x.uid === selectedUid);
   if (!live) return;
-  live.loiterUntil = elapsed + IGNORE_DELAY_SEC;
+  live.loiterUntil = elapsed + IGNORE_DELAY_SEC; ignoreHeat++;
   selectedUid = waiting().find((x) => x.uid !== live.uid)?.uid ?? 0;
   burst("🙈 IGNORED!");
   log.unshift(`🙈 You ignored ${live.card.person} (${live.card.dept}). They look… relaxed? They'll loiter for ${IGNORE_DELAY_SEC}s — bored, or brewing?`);
@@ -190,7 +197,7 @@ function choose(choice: Choice) {
   const q = qualityOf({ ...choice.fx, ...(choice.delayed ? { stress: 10, risk: 10 } : {}) });
   meters = applyEffects(meters, choice.fx);
   timeLeft += choice.fx.time ?? 0;
-  if (q === "good") { combo++; bestCombo = Math.max(bestCombo, combo); } else if (q === "bad") combo = 0;
+  if (q === "good") { combo++; bestCombo = Math.max(bestCombo, combo); ignoreHeat = Math.max(0, ignoreHeat - 1); } else if (q === "bad") combo = 0;
   const gained = Math.round((choice.fx.score ?? 50) * (1 + combo * 0.15));
   score += gained;
   log.unshift(`${choice.fx.score && q === "good" ? "✅" : "🎲"} ${choice.label} (+${gained} pts${combo > 1 ? `, combo ×${combo}` : ""})`);
@@ -238,14 +245,14 @@ function render() {
         ${meter("😱 Stress", meters.stress, "#ff9f1a")}${meter("☣️ Risk", meters.risk, "#c44dff")}${meter("💸 Cost", meters.cost, "#ff4f9a")}
         ${meter("🏛️ Board Confidence", meters.confidence, "#22c7e8", true)}${meter("🏖️ Chill", meters.chill, "#37d35a", true)}
       </div>
-      <div class="panel timer">⏱️ ${Math.max(0, Math.ceil(timeLeft))}s<div style="font-size:13px">SCORE ${score} · COMBO ×${combo}<br>📥 ${waiting().length} WAITING</div></div>
+      <div class="panel timer">⏱️ ${Math.max(0, Math.ceil(timeLeft))}s<div style="font-size:13px">SCORE ${score} · COMBO ×${combo}<br>📥 ${waiting().length} WAITING · 🌶️ INTENSITY Lv.${pressureLevel(elapsed)}${ignoreHeat ? `<br>🔥 IGNORE HEAT ×${ignoreHeat}` : ""}</div></div>
     </div>
     <div class="layout">
       <div>
         <div class="panel cio-box">${cioSVG(st)}<div><span class="stage-name">${STAGE_NAMES[st]}</span></div>
         <div class="scorebox">${consequences.length ? `⏳ ${consequences.length} consequence(s) ticking…` : `💬 IT desk says: “${clicheAt(elapsed)}”`}</div>
         <div class="log">${log.slice(0, 7).map((l) => `<div>${l}</div>`).join("")}</div></div>
-        <div class="stackbar ${waiting().length >= 3 ? "hot" : ""}">📥 <b>${waiting().length} new request${waiting().length === 1 ? "" : "s"} stacking up</b>${loitering().length ? ` · 🙈 ${loitering().length} loitering` : ""}<div class="stacktrack"><i style="width:${Math.min(100, (waiting().length / 6) * 100)}%"></i></div><small>${waiting().length >= 4 ? "⚠️ STACKING UP! Answer one or Ignore a silly one — overflow = +Stress!" : waiting().length >= 2 ? "They pile up fast — keep 'em moving, CIO!" : "Inbox under control. Enjoy the silence."}</small></div>
+        <div class="stackbar ${waiting().length >= 3 ? "hot" : ""}">📥 <b>${waiting().length} new request${waiting().length === 1 ? "" : "s"} stacking up</b>${loitering().length ? ` · 🙈 ${loitering().length} loitering` : ""}<div class="stacktrack"><i style="width:${Math.min(100, (waiting().length / 6) * 100)}%"></i></div><small>${waiting().length >= 4 ? "⚠️ STACKING UP! Answer one or Ignore a silly one — overflow = +Stress!" : waiting().length >= 2 ? "They pile up fast — keep 'em moving, CIO!" : "Inbox under control. Enjoy the silence."}${ignoreHeat >= 2 ? `<br>🔥 <b>Ignore Heat ×${ignoreHeat}:</b> people have noticed the ignoring — wander-off odds are down and pile-ups loom! It cools off slowly if you actually help someone.` : ""}</small></div>
         <h3>📥 INCOMING! (${waiting().length})</h3>
         <div class="queue">${waiting().map((x, i) => `<button class="qcard ${x.uid === selectedUid ? "sel" : ""} ${x.card.followUp ? "follow" : ""}" data-uid="${x.uid}"><b>#${i + 1}</b> ${x.card.emoji} ${x.card.title}${x.uid === newestUid ? ` <span class="newtag">🆕 NEW!</span>` : ""}<small>${x.card.person} · ${x.card.dept} · ${SEV_LABEL[severityOf(x.card)]}</small></button>`).join("")}</div>
         ${loitering().map((x) => `<div class="loiter"><span class="loiter-face">😌</span><div><b>${x.card.emoji} ${x.card.person} is loitering…</b><br><small>“…fine. FINE. I'll just wait here.” <span class="foot">🦶</span><i>taptaptap</i> — decides in ${Math.max(0, Math.ceil(x.loiterUntil! - elapsed))}s: 🥱 bored &amp; gone, or 😱 WORSE?</small></div></div>`).join("")}
@@ -254,7 +261,7 @@ function render() {
         ${sel ? `<span class="who">${sel.card.emoji} ${sel.card.person}</span> <span class="dept">${sel.card.dept}</span> <span class="dept" style="background:var(--yellow);color:var(--ink)">${SEV_LABEL[severityOf(sel.card)]}</span>
         <h2>${sel.card.title}</h2><p style="font-size:18px;line-height:1.5">${sel.card.body}</p>
         <div class="choices">${sel.card.choices.map((ch, i) => `<button class="choice" data-choice="${i}"><span class="lane">${ch.lane}</span> <b>${i + 1}. ${ch.label}</b> ${ch.partner ? `<span class="partner">★ ${ch.partner}</span>` : ""}<small>${ch.detail}</small></button>`).join("")}</div>
-        <button class="ignorebtn" id="ignore">🙈 0 · IGNORE — pretend you're in a meeting <small style="display:block;font-weight:600">They'll loiter ~${IGNORE_DELAY_SEC}s looking relaxed… then 🥱 wander off bored (${Math.round(ignoreWanderChance(severityOf(sel.card)) * 100)}% for ${SEV_LABEL[severityOf(sel.card)]}) or 😱 come back WORSE. Silly requests? Often smart. Serious ones? Brave.</small></button>
+        <button class="ignorebtn" id="ignore">🙈 0 · IGNORE — pretend you're in a meeting <small style="display:block;font-weight:600">They'll loiter ~${IGNORE_DELAY_SEC}s looking relaxed… then 🥱 wander off bored (${Math.round(ignoreWanderChance(severityOf(sel.card), ignoreHeat) * 100)}% for ${SEV_LABEL[severityOf(sel.card)]}${ignoreHeat ? `, Ignore Heat ×${ignoreHeat} dragging odds down` : ""}) or 😱 come back WORSE. Silly requests? Often smart. Serious ones? Brave.</small></button>
         <p><small>Click a card in the inbox to switch · Keys <span class="kbd">1</span> <span class="kbd">2</span> <span class="kbd">3</span> pick a strategy · <span class="kbd">0</span>/<span class="kbd">I</span> ignore · ⚠️ instant relief often means a delayed WHAM!</small></p>`
         : `<h2>📞 …silence…</h2><p>Enjoy it. It won't last.</p>`}
       </div>

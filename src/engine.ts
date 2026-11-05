@@ -36,21 +36,31 @@ export interface Scheduled { at: number; text: string; fx: Partial<Effects>; fol
 export function dueEvents(queue: Scheduled[], elapsed: number): { due: Scheduled[]; pending: Scheduled[] } {
   return { due: queue.filter((e) => e.at <= elapsed), pending: queue.filter((e) => e.at > elapsed) };
 }
-/** Spawn interval (s) shrinks as the game accelerates. */
+/** Intensity level 0–5, rising every 25 seconds. Drives spawn pressure and double-request bursts. */
+export function pressureLevel(elapsed: number): number {
+  return Math.min(5, Math.floor(Math.max(0, elapsed) / 25));
+}
+/** Spawn interval (s) shrinks as intensity rises. */
 export function spawnInterval(elapsed: number): number {
-  // Playtest-tuned: starts gentle (~5.2s), presses harder late (1.9s floor) so slow players can overflow late, never early.
-  return Math.max(1.9, 5.2 - elapsed * 0.042);
+  return Math.max(1.4, 5.2 - elapsed * 0.05 - pressureLevel(elapsed) * 0.1);
+}
+/** Chance a spawn arrives as a DOUBLE REQUEST (two cards at once) once the pressure is on. */
+export function doubleSpawnChance(elapsed: number): number {
+  const p = pressureLevel(elapsed);
+  return p < 2 ? 0 : Math.min(0.5, 0.15 + p * 0.07);
 }
 /* ---- Ignore mechanic: walk away and hope they get bored ---- */
 export type Severity = 1 | 2 | 3; // 1 = silly/low-stakes, 3 = serious
 export const IGNORE_DELAY_SEC = 3;
-/** Chance the requester gets bored and wanders off. Silly requests are safe to ignore; serious ones are not. */
-export function ignoreWanderChance(severity: Severity): number {
-  return severity === 1 ? 0.85 : severity === 2 ? 0.55 : 0.25;
+/** Chance the requester gets bored and wanders off. Silly requests are safe to ignore; serious ones are not.
+ *  Ignore Heat (recent ignoring) drags the odds down — people notice being ignored. */
+export function ignoreWanderChance(severity: Severity, ignoreHeat = 0): number {
+  const base = severity === 1 ? 0.85 : severity === 2 ? 0.55 : 0.25;
+  return Math.max(0.05, base - ignoreHeat * 0.07);
 }
 export interface IgnoreResult { outcome: "wander" | "escalate"; fx: Partial<Effects>; sfx: string }
-export function resolveIgnore(severity: Severity, rng: number): IgnoreResult {
-  if (rng < ignoreWanderChance(severity)) {
+export function resolveIgnore(severity: Severity, rng: number, ignoreHeat = 0): IgnoreResult {
+  if (rng < ignoreWanderChance(severity, ignoreHeat)) {
     return { outcome: "wander", sfx: "BORED…", fx: { stress: -3, risk: severity === 3 ? 2 : 0, chill: 3, confidence: 1, score: 40 } };
   }
   return {
