@@ -58,6 +58,21 @@ export function resolveIgnore(severity: Severity, rng: number): IgnoreResult {
     fx: { stress: 5 + severity * 3, risk: 3 + severity * 2, cost: severity * 2, confidence: -2 - severity * 2, chill: -5, score: 0 },
   };
 }
+/** Rotating IT-desk clichés shown under the CIO (cycles every 4 seconds of game time). */
+export const IT_CLICHES = [
+  "Did you try restarting?",
+  "Did you update to the latest version?",
+  "Can you please raise a ticket?",
+  "Have you tried turning it off and on again?",
+  "That'll be fixed in the next patch.",
+  "Works on my machine.",
+  "Have you cleared your cache? Like, ever?",
+  "It's not a bug, it's an undocumented feature!",
+  "Please hold… your call is important to us. Allegedly.",
+] as const;
+export function clicheAt(elapsed: number): string {
+  return IT_CLICHES[Math.floor(Math.max(0, elapsed) / 4) % IT_CLICHES.length];
+}
 export function qualityOf(fx: Partial<Effects>): "good" | "bad" | "mixed" {
   const chaos = (fx.stress ?? 0) + (fx.risk ?? 0) + (fx.cost ?? 0) - (fx.confidence ?? 0) - (fx.chill ?? 0);
   if (chaos <= -8) return "good";

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { applyEffects, calmScore, dueEvents, ignoreWanderChance, IGNORE_DELAY_SEC, isGameOver, qualityOf, resolveIgnore, spawnInterval, stageFor } from "./engine";
+import { applyEffects, calmScore, clicheAt, dueEvents, ignoreWanderChance, IGNORE_DELAY_SEC, isGameOver, IT_CLICHES, qualityOf, resolveIgnore, spawnInterval, stageFor } from "./engine";
 import { CARDS, cardById, escalatedClone, severityOf } from "./cards";
 
 const base = { stress: 50, risk: 50, cost: 50, confidence: 50, chill: 50 };
@@ -39,6 +39,17 @@ describe("ignore mechanic", () => {
     const silly = resolveIgnore(1, 0.999); const serious = resolveIgnore(3, 0.999);
     expect(silly.outcome).toBe("escalate"); expect(serious.sfx).toBe("UH OH!");
     expect((serious.fx.stress ?? 0) + (serious.fx.risk ?? 0)).toBeGreaterThan((silly.fx.stress ?? 0) + (silly.fx.risk ?? 0));
+  });
+});
+describe("IT-desk clichés", () => {
+  it("includes the classics and cycles over time", () => {
+    expect(IT_CLICHES).toContain("Did you try restarting?");
+    expect(IT_CLICHES).toContain("Did you update to the latest version?");
+    expect(IT_CLICHES).toContain("Can you please raise a ticket?");
+    expect(IT_CLICHES.length).toBeGreaterThanOrEqual(6);
+    expect(clicheAt(0)).toBe(IT_CLICHES[0]);
+    expect(clicheAt(4)).toBe(IT_CLICHES[1]);
+    expect(clicheAt(4 * IT_CLICHES.length)).toBe(IT_CLICHES[0]); // wraps around
   });
 });
 describe("card deck", () => {

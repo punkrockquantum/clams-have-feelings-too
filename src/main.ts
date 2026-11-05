@@ -1,5 +1,5 @@
 import { CARDS, cardById, escalatedClone, severityOf, type GameCard, type Choice } from "./cards";
-import { applyEffects, dueEvents, ignoreWanderChance, IGNORE_DELAY_SEC, isGameOver, qualityOf, resolveIgnore, spawnInterval, stageFor, STAGE_NAMES, type Meters, type Scheduled } from "./engine";
+import { applyEffects, clicheAt, dueEvents, ignoreWanderChance, IGNORE_DELAY_SEC, isGameOver, qualityOf, resolveIgnore, spawnInterval, stageFor, STAGE_NAMES, type Meters, type Scheduled } from "./engine";
 
 const app = document.getElementById("app")!;
 
@@ -236,7 +236,7 @@ function render() {
     <div class="layout">
       <div>
         <div class="panel cio-box">${cioSVG(st)}<div><span class="stage-name">${STAGE_NAMES[st]}</span></div>
-        <div class="scorebox">${consequences.length ? `⏳ ${consequences.length} consequence(s) ticking…` : "✨ No ticking time-bombs. Suspicious."}</div>
+        <div class="scorebox">${consequences.length ? `⏳ ${consequences.length} consequence(s) ticking…` : `💬 IT desk says: “${clicheAt(elapsed)}”`}</div>
         <div class="log">${log.slice(0, 7).map((l) => `<div>${l}</div>`).join("")}</div></div>
         <h3>📥 INCOMING! (${waiting().length})</h3>
         <div class="queue">${waiting().map((x) => `<button class="qcard ${x.uid === selectedUid ? "sel" : ""} ${x.card.followUp ? "follow" : ""}" data-uid="${x.uid}">${x.card.emoji} ${x.card.title}<small>${x.card.person} · ${x.card.dept} · ${SEV_LABEL[severityOf(x.card)]}</small></button>`).join("")}</div>
