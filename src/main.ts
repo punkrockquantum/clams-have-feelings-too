@@ -5,36 +5,73 @@ const app = document.getElementById("app")!;
 
 /* ---------- CIO character: appearance evolves with performance ---------- */
 function cioSVG(stage: number): string {
-  const hair = [
-    "M60 78 L38 18 L66 48 L78 6 L96 42 L118 4 L128 46 L156 14 L158 82 Z",
-    "M62 76 L46 26 L72 46 L86 16 L102 44 L124 18 L136 52 L152 30 L152 78 Z",
-    "M64 74 L56 34 L80 48 L98 28 L116 48 L138 34 L144 74 Z",
-    "M66 68 Q105 30 144 68 L144 54 Q105 24 66 54 Z",
-    "M66 66 Q105 32 144 66 L144 52 Q105 26 66 52 Z",
-    "M66 66 Q105 32 144 66 L144 52 Q105 26 66 52 Z",
+  const skin = "#ffcf4d", skinShade = "#f0a832", muzzle = "#ffe29a";
+  const wild = stage <= 1, frazzled = stage <= 2;
+  /* --- hair: wilder and taller the worse it gets --- */
+  const hairPath = [
+    "M62 96 L44 22 L76 58 L84 4 L108 50 L128 -2 L142 48 L172 6 L178 56 L206 22 L202 100 Q130 58 62 96 Z",
+    "M64 94 L52 34 L82 58 L96 14 L116 52 L138 18 L152 56 L182 30 L188 96 Q130 62 64 94 Z",
+    "M66 92 L60 44 L88 58 L106 30 L126 54 L148 32 L164 58 L184 46 L186 92 Q130 64 66 92 Z",
+    "M68 88 Q76 38 130 36 Q184 38 192 88 Q160 58 130 60 Q100 58 68 88 Z",
+    "M68 88 Q78 40 130 38 Q182 40 192 88 Q158 60 130 62 Q102 60 68 88 Z",
+    "M68 88 Q78 40 130 38 Q182 40 192 88 Q158 60 130 62 Q102 60 68 88 Z",
   ][stage];
-  const eyes = stage <= 1
-    ? `<circle cx="84" cy="96" r="11" fill="#fff" stroke="#141414" stroke-width="3"/><circle cx="126" cy="96" r="11" fill="#fff" stroke="#141414" stroke-width="3"/><circle cx="84" cy="96" r="4" fill="red"/><circle cx="126" cy="96" r="4" fill="red"/><path d="M76 90 l16 12 M92 90 l-16 12 M118 90 l16 12 M134 90 l-16 12" stroke="red" stroke-width="1.6"/>`
-    : stage === 2
-    ? `<circle cx="84" cy="96" r="10" fill="#fff" stroke="#141414" stroke-width="3"/><circle cx="126" cy="96" r="10" fill="#fff" stroke="#141414" stroke-width="3"/><circle cx="84" cy="98" r="4" fill="#141414"/><circle cx="126" cy="98" r="4" fill="#141414"/><path d="M70 82 q14 -8 28 0 M112 82 q14 -8 28 0" stroke="#141414" stroke-width="3" fill="none"/>`
-    : stage >= 5
-    ? `<rect x="62" y="84" width="86" height="22" rx="11" fill="#141414"/><rect x="70" y="89" width="28" height="7" rx="3" fill="#7ee8ff"/>`
-    : `<circle cx="84" cy="96" r="10" fill="#fff" stroke="#141414" stroke-width="3"/><circle cx="126" cy="96" r="10" fill="#fff" stroke="#141414" stroke-width="3"/><circle cx="84" cy="95" r="4" fill="#141414"/><circle cx="126" cy="95" r="4" fill="#141414"/>`;
-  const mouth = ["M78 138 l12 -8 l12 8 l12 -8 l12 8", "M80 140 q25 -14 50 0", "M82 138 q23 10 46 0", "M84 132 q21 14 42 0", "M82 130 q23 20 46 0", "M78 128 q27 26 54 0"][stage];
-  const shirt = ["#b8b8b8", "#cfd8dc", "#f5f5f5", "#bfe3ff", "#7ee08a", "#ff5f8f"][stage];
-  const sweat = stage <= 1 ? `<text x="30" y="90" font-size="26">💧</text><text x="168" y="80" font-size="22">💧</text>` : "";
-  const extra = stage === 5
-    ? `<circle cx="182" cy="34" r="22" fill="#ffd21f" stroke="#141414" stroke-width="3"/><text x="168" y="178" font-size="30">🍹</text><text x="18" y="180" font-size="26">🌴</text>`
-    : stage === 4 ? `<text x="164" y="70" font-size="24">😎</text>` : stage <= 1 ? `<text x="170" y="110" font-size="24">💢</text>` : "";
-  const tie = stage <= 3 ? `<path d="M105 168 l10 0 l6 34 l-11 16 l-11 -16 Z" fill="${stage <= 1 ? "#ff3b30" : "#2255cc"}" stroke="#141414" stroke-width="3"/>` : stage === 4 ? "" : `<text x="74" y="196" font-size="20">🌺</text><text x="118" y="206" font-size="20">🌺</text>`;
-  return `<svg viewBox="0 0 210 235" class="wobble" role="img" aria-label="The CIO, stage ${stage}">
-    ${stage === 5 ? `<rect x="4" y="4" width="202" height="227" rx="18" fill="#8fe3ff" stroke="#141414" stroke-width="3"/>` : ""}
-    ${extra}${sweat}
-    <path d="M45 235 L60 168 Q105 148 150 168 L165 235 Z" fill="${shirt}" stroke="#141414" stroke-width="4"/>${tie}
-    <circle cx="105" cy="105" r="52" fill="#ffd9b3" stroke="#141414" stroke-width="4"/>
-    <path d="${hair}" fill="${stage >= 4 ? "#5a3a1a" : "#3a2a1a"}" stroke="#141414" stroke-width="3"/>
-    ${eyes}<path d="${mouth}" stroke="#141414" stroke-width="4" fill="none" stroke-linecap="round"/>
-    <path d="M58 122 q-12 4 0 16 M152 122 q12 4 0 16" stroke="#141414" stroke-width="3" fill="#ffd9b3"/>
+  const flyaways = wild ? `<path d="M52 40 q-18 -14 -26 -4 M208 44 q16 -16 26 -8 M126 2 q-2 -14 -12 -20" stroke="#5a3a1a" stroke-width="4" fill="none" stroke-linecap="round"/>` : "";
+  const hairLines = stage >= 3 ? `<path d="M84 66 q40 -22 88 -4 M92 52 q36 -14 72 0" stroke="#5a3a1a" stroke-width="3" fill="none" opacity=".55"/>` : `<path d="M78 70 l14 -18 M104 56 l8 -20 M150 54 l12 -16 M176 72 l14 -12" stroke="#3a2410" stroke-width="3" stroke-linecap="round"/>`;
+  /* --- eyes: big white cartoon eyes, pupils, veins when bloodshot --- */
+  const pupilOff = stage === 0 ? [-5, -6] : stage === 1 ? [4, 3] : stage === 2 ? [0, 5] : [0, 0];
+  const veins = stage <= 1 ? `<path d="M84 92 l14 8 M98 84 l-6 14 M150 86 l12 10 M164 94 l-12 8" stroke="#e33" stroke-width="2" fill="none"/>` : "";
+  const bags = frazzled ? `<path d="M82 138 q18 8 36 2 M142 140 q18 6 34 -2" stroke="${skinShade}" stroke-width="3" fill="none"/>` : "";
+  const brows = frazzled
+    ? `<path d="M80 74 l36 10 M176 74 l-36 10" stroke="#3a2410" stroke-width="6" stroke-linecap="round"/>`
+    : `<path d="M82 72 q16 -10 34 -4 M144 68 q18 -6 34 4" stroke="#3a2410" stroke-width="6" fill="none" stroke-linecap="round"/>`;
+  const eyes = stage === 5
+    ? `<rect x="76" y="88" width="108" height="30" rx="15" fill="#141414"/><rect x="84" y="94" width="38" height="9" rx="4" fill="#8fe3ff"/><rect x="140" y="94" width="34" height="9" rx="4" fill="#8fe3ff"/><path d="M76 100 L58 92 M184 100 L202 92" stroke="#141414" stroke-width="5" stroke-linecap="round"/>`
+    : `<ellipse cx="98" cy="106" rx="17" ry="21" fill="#fff" stroke="#141414" stroke-width="3.5"/><ellipse cx="162" cy="106" rx="17" ry="21" fill="#fff" stroke="#141414" stroke-width="3.5"/>${veins}<circle cx="${98 + pupilOff[0]}" cy="${106 + pupilOff[1]}" r="5.5" fill="#141414"/><circle cx="${162 + pupilOff[0]}" cy="${106 + pupilOff[1]}" r="5.5" fill="#141414"/><circle cx="${100 + pupilOff[0]}" cy="${103 + pupilOff[1]}" r="1.8" fill="#fff"/><circle cx="${164 + pupilOff[0]}" cy="${103 + pupilOff[1]}" r="1.8" fill="#fff"/>`;
+  const shadesOnHead = stage === 4 ? `<rect x="84" y="34" width="92" height="20" rx="10" fill="#141414" transform="rotate(-5 130 44)"/>` : "";
+  /* --- mouth on a lighter muzzle, overbite-ish expressive shapes --- */
+  const mouth = [
+    `<rect x="100" y="146" width="60" height="18" rx="5" fill="#fff" stroke="#141414" stroke-width="3"/><path d="M115 146 v18 M130 146 v18 M145 146 v18 M100 155 h60" stroke="#141414" stroke-width="2"/>`,
+    `<path d="M98 156 q10 -10 20 0 q10 10 20 0 q10 -10 22 0" stroke="#141414" stroke-width="4.5" fill="none" stroke-linecap="round"/>`,
+    `<path d="M104 162 q26 -14 52 0" stroke="#141414" stroke-width="4.5" fill="none" stroke-linecap="round"/>`,
+    `<path d="M106 150 q24 16 48 0" stroke="#141414" stroke-width="4.5" fill="none" stroke-linecap="round"/>`,
+    `<path d="M102 148 q28 24 56 0 l-4 14 q-24 12 -48 0 Z" fill="#fff" stroke="#141414" stroke-width="3"/>`,
+    `<path d="M98 146 q32 30 64 0 l-6 20 q-26 14 -52 0 Z" fill="#7a1f1f" stroke="#141414" stroke-width="3"/><ellipse cx="130" cy="164" rx="14" ry="6" fill="#ff7d9c"/>`,
+  ][stage];
+  const stubble = stage <= 1 ? `<g fill="#8a6a3a"><circle cx="106" cy="138" r="1.6"/><circle cx="122" cy="142" r="1.6"/><circle cx="140" cy="140" r="1.6"/><circle cx="154" cy="136" r="1.6"/><circle cx="114" cy="132" r="1.6"/><circle cx="148" cy="146" r="1.6"/></g>` : "";
+  const sweat = stage === 0 ? `<path d="M52 84 q-10 16 0 22 q10 -6 0 -22 M208 78 q-10 16 0 22 q10 -6 0 -22 M66 128 q-8 13 0 18 q8 -5 0 -18" fill="#7ecbff" stroke="#141414" stroke-width="2.5"/>` : stage === 1 ? `<path d="M54 86 q-10 16 0 22 q10 -6 0 -22 M206 82 q-10 16 0 22 q10 -6 0 -22" fill="#7ecbff" stroke="#141414" stroke-width="2.5"/>` : stage === 2 ? `<path d="M56 90 q-9 14 0 19 q9 -5 0 -19" fill="#7ecbff" stroke="#141414" stroke-width="2.5"/>` : "";
+  const anger = stage === 0 ? `<path d="M196 66 q10 -12 20 -2 M206 56 q2 12 -6 20" stroke="#e33" stroke-width="4" fill="none" stroke-linecap="round"/>` : "";
+  /* --- clothing --- */
+  const flowers = `<g><g fill="#fff"><circle cx="86" cy="238" r="6"/><circle cx="98" cy="230" r="6"/><circle cx="98" cy="246" r="6"/><circle cx="110" cy="238" r="6"/></g><circle cx="98" cy="238" r="4" fill="#ffd21f"/><g fill="#ffd21f"><circle cx="164" cy="262" r="6"/><circle cx="176" cy="254" r="6"/><circle cx="176" cy="270" r="6"/><circle cx="188" cy="262" r="6"/></g><circle cx="176" cy="262" r="4" fill="#ff4f9a"/><g fill="#7ee08a"><circle cx="112" cy="282" r="5"/><circle cx="122" cy="276" r="5"/><circle cx="122" cy="288" r="5"/><circle cx="132" cy="282" r="5"/></g><circle cx="122" cy="282" r="3.5" fill="#fff"/></g>`;
+  const suitCol = ["#6b7280", "#7a8699", "#8fa3bf", "#3366aa", "#37b24d", "#ff5f8f"][stage];
+  const tieRot = stage === 0 ? "rotate(18 130 196)" : stage === 1 ? "rotate(-11 130 196)" : stage === 2 ? "rotate(5 130 196)" : "";
+  const tie = stage <= 3 ? `<g transform="${tieRot}"><path d="M122 182 h16 l4 14 l-12 38 l-12 -38 Z" fill="${stage <= 1 ? "#d92626" : "#c2255c"}" stroke="#141414" stroke-width="3"/></g><path d="M130 176 l-14 8 l14 22 l14 -22 Z" fill="#fff" stroke="#141414" stroke-width="3"/>` : "";
+  const folds = stage <= 3 ? `<path d="M76 236 q10 30 4 62 M184 236 q-10 30 -4 62 M96 214 q-6 20 0 40 M164 214 q6 20 0 40" stroke="#00000033" stroke-width="4" fill="none"/>` : `<path d="M84 232 q6 26 0 52 M176 232 q-6 26 0 52" stroke="#0000002b" stroke-width="4" fill="none"/>`;
+  const torso = stage === 5
+    ? `<path d="M66 290 L192 290 L198 334 L158 334 L130 304 L102 334 L60 334 Z" fill="#2f6fd0" stroke="#141414" stroke-width="4"/><path d="M72 216 Q130 192 188 216 L192 302 L156 302 L130 238 L104 302 L68 302 Z" fill="${suitCol}" stroke="#141414" stroke-width="4"/><path d="M104 302 L130 238 L156 302 L144 302 L130 262 L116 302 Z" fill="${muzzle}" stroke="#141414" stroke-width="3"/>${flowers}`
+    : stage === 4
+    ? `<path d="M66 356 L74 214 Q130 192 186 214 L194 356 Z" fill="#4a5568" stroke="#141414" stroke-width="4"/><path d="M74 214 Q130 192 186 214 L190 306 L70 306 Z" fill="${suitCol}" stroke="#141414" stroke-width="4"/><path d="M108 200 l22 18 l22 -18 l-6 26 h-32 Z" fill="#2f9e44" stroke="#141414" stroke-width="3"/><circle cx="130" cy="238" r="3.5" fill="#141414"/><circle cx="130" cy="256" r="3.5" fill="#141414"/>`
+    : `<path d="M66 356 L74 214 Q130 192 186 214 L194 356 Z" fill="#3d4b63" stroke="#141414" stroke-width="4"/><path d="M74 214 Q130 192 186 214 L190 310 L70 310 Z" fill="${suitCol}" stroke="#141414" stroke-width="4"/><path d="M98 198 L130 252 L162 198 L172 214 L130 300 L88 214 Z" fill="#26314a" stroke="#141414" stroke-width="3"/><path d="M112 202 L130 226 L148 202 L142 250 L130 262 L118 250 Z" fill="#fff" stroke="#141414" stroke-width="2.5"/>${tie}`;
+  const legs = stage === 5
+    ? `<path d="M102 324 v27 M158 324 v27" stroke="${skin}" stroke-width="16" stroke-linecap="round"/><path d="M84 350 h36 l5 9 H80 Z M142 350 h36 l5 9 h-44 Z" fill="#a9713a" stroke="#141414" stroke-width="3"/><path d="M88 352 q14 -8 28 0 M146 352 q14 -8 28 0" stroke="#141414" stroke-width="3" fill="none"/>`
+    : `<path d="M88 330 h34 v14 H84 Z M138 330 h34 v14 h-38 Z" fill="#222" stroke="#141414" stroke-width="3"/>`;
+  const cocktail = stage === 5 ? `<g><path d="M209 308 l13 -26 M222 282 l-5 20 h22 Z" fill="#bfefff" stroke="#141414" stroke-width="3"/><path d="M213 292 h19" stroke="#ff4f9a" stroke-width="5"/><path d="M229 270 l17 -13 l-3 19 Z" fill="#37d35a" stroke="#141414" stroke-width="2.5"/><circle cx="230" cy="274" r="4" fill="#ffd21f" stroke="#141414" stroke-width="2"/></g>` : "";
+  const hand = (x: number, y: number) => `<g><ellipse cx="${x}" cy="${y}" rx="13" ry="16" fill="${skin}" stroke="#141414" stroke-width="3"/><path d="M${x - 8} ${y + 2} q3 8 1 14 M${x} ${y + 4} q1 9 -1 15 M${x + 8} ${y + 2} q-2 8 -1 13" stroke="#141414" stroke-width="2" fill="none"/></g>`;
+  return `<svg viewBox="0 0 260 360" class="wobble" role="img" aria-label="The CIO, stage ${stage}">
+    ${stage === 5 ? `<rect x="3" y="3" width="254" height="354" rx="20" fill="#8fe3ff" stroke="#141414" stroke-width="3"/><circle cx="224" cy="42" r="24" fill="#ffd21f" stroke="#141414" stroke-width="3"/><path d="M14 78 q2 -30 16 -44 M15 76 q-8 -24 -6 -40 M17 78 q16 -20 32 -24" stroke="#2f9e44" stroke-width="6" fill="none" stroke-linecap="round"/>` : ""}
+    ${stage >= 4 ? "" : ""}${sweat}${anger}
+    ${torso}${legs}
+    <path d="M72 222 q-26 34 -18 76 M188 222 q26 34 18 76" stroke="${stage >= 4 ? skin : suitCol}" stroke-width="19" fill="none" stroke-linecap="round"/>
+    ${hand(52, 306)}${hand(208, 306)}${cocktail}
+    <rect x="116" y="162" width="28" height="26" fill="${skin}" stroke="#141414" stroke-width="3"/>
+    <circle cx="66" cy="116" r="13" fill="${skin}" stroke="#141414" stroke-width="3.5"/><circle cx="194" cy="116" r="13" fill="${skin}" stroke="#141414" stroke-width="3.5"/>
+    <path d="M64 114 q6 -6 10 2 M196 114 q-6 -6 -10 2" stroke="${skinShade}" stroke-width="3" fill="none"/>
+    <ellipse cx="130" cy="108" rx="64" ry="60" fill="${skin}" stroke="#141414" stroke-width="4"/>
+    <path d="${hairPath}" fill="#6b4423" stroke="#141414" stroke-width="3.5"/>${flyaways}${hairLines}${shadesOnHead}
+    ${brows}${eyes}${bags}
+    <path d="M132 104 q16 20 4 30 q-7 6 -17 2" fill="none" stroke="#141414" stroke-width="3.5" stroke-linecap="round"/>
+    <ellipse cx="130" cy="152" rx="36" ry="22" fill="${muzzle}" opacity=".85"/>
+    ${stubble}${mouth}
   </svg>`;
 }
 
@@ -167,7 +204,7 @@ function end(won: boolean, reason: string) {
   const st = stageFor(meters);
   app.innerHTML = `<div class="end"><div class="panel end-box">
     <h1 class="logo" style="font-size:52px">${won ? "🏖️ RELAXATION!" : "💥 GAME OVER!"}</h1>
-    <div style="max-width:240px;margin:0 auto">${cioSVG(won ? 5 : Math.min(st, 1))}</div>
+    <div style="max-width:310px;margin:0 auto">${cioSVG(won ? 5 : Math.min(st, 1))}</div>
     <p class="stage-name">${won ? "BEACH MODE 🏖️" : STAGE_NAMES[st]}</p>
     <p style="font-size:18px;line-height:1.5">${reason}</p>
     <p class="scorebox">SCORE: ${score} &nbsp;·&nbsp; BEST COMBO: ×${bestCombo} &nbsp;·&nbsp; SURVIVED: ${Math.floor(elapsed)}s</p>
