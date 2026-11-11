@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { applyEffects, calmScore, clicheAt, doubleSpawnChance, dueEvents, ignoreWanderChance, IGNORE_DELAY_SEC, isGameOver, IT_CLICHES, pressureLevel, qualityOf, resolveIgnore, spawnInterval, stageFor } from "./engine";
+import { applyEffects, calmScore, clicheAt, doubleSpawnChance, dueEvents, ignoreWanderChance, IGNORE_DELAY_SEC, isGameOver, IT_CLICHES, newTally, pressureLevel, qualityOf, resolveIgnore, spawnInterval, stageFor, tallyChoice, tallyConsequence, tallyIgnore, tallyTotal } from "./engine";
 import { CARDS, cardById, escalatedClone, severityOf } from "./cards";
 
 const base = { stress: 50, risk: 50, cost: 50, confidence: 50, chill: 50 };
@@ -68,6 +68,27 @@ describe("escalating intensity", () => {
     // a roll that would wander at zero heat escalates when the heat is on
     expect(resolveIgnore(2, 0.5, 0).outcome).toBe("wander");
     expect(resolveIgnore(2, 0.5, 4).outcome).toBe("escalate");
+  });
+});
+describe("points tally", () => {
+  it("starts empty and totals choice + ignore points", () => {
+    expect(tallyTotal(newTally())).toBe(0);
+    let t = tallyChoice(newTally(), 120, "good", false);
+    t = tallyIgnore(t, "wander", 40);
+    expect(tallyTotal(t)).toBe(160);
+    expect(t).toMatchObject({ choicesMade: 1, goodCalls: 1, ignoresTried: 1, ignoresWorked: 1 });
+  });
+  it("counts traps, escalated ignores and landed consequences without awarding ignore-escalation points", () => {
+    let t = tallyChoice(newTally(), 80, "bad", true);
+    t = tallyIgnore(t, "escalate", 0);
+    t = tallyConsequence(tallyConsequence(t));
+    expect(t).toMatchObject({ trapsTaken: 1, goodCalls: 0, ignoresTried: 1, ignoresEscalated: 1, consequencesHit: 2, pointsFromIgnores: 0 });
+    expect(tallyTotal(t)).toBe(80);
+  });
+  it("is immutable — tallying returns a new tally", () => {
+    const t0 = newTally();
+    tallyChoice(t0, 50, "good", false);
+    expect(t0.choicesMade).toBe(0);
   });
 });
 describe("card deck", () => {
