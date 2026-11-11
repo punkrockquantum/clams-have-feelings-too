@@ -103,6 +103,12 @@ export function tallyConsequence(t: ScoreTally): ScoreTally {
 }
 export const tallyTotal = (t: ScoreTally): number => t.pointsFromChoices + t.pointsFromIgnores;
 
+/* ---- Ephemeral league table: lives in memory only, dies on refresh ---- */
+export interface LeagueEntry { name: string; score: number; chill: number; survived: number; won: boolean }
+export function addToLeague(entries: LeagueEntry[], entry: LeagueEntry, cap = 10): LeagueEntry[] {
+  return [...entries, entry].sort((a, b) => b.score - a.score || b.chill - a.chill || a.survived - b.survived).slice(0, cap);
+}
+
 export function qualityOf(fx: Partial<Effects>): "good" | "bad" | "mixed" {
   const chaos = (fx.stress ?? 0) + (fx.risk ?? 0) + (fx.cost ?? 0) - (fx.confidence ?? 0) - (fx.chill ?? 0);
   if (chaos <= -8) return "good";

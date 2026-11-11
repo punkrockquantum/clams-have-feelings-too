@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { applyEffects, calmScore, clicheAt, doubleSpawnChance, dueEvents, ignoreWanderChance, IGNORE_DELAY_SEC, isGameOver, IT_CLICHES, newTally, pressureLevel, qualityOf, resolveIgnore, spawnInterval, stageFor, tallyChoice, tallyConsequence, tallyIgnore, tallyTotal } from "./engine";
+import { addToLeague, applyEffects, calmScore, clicheAt, doubleSpawnChance, dueEvents, ignoreWanderChance, IGNORE_DELAY_SEC, isGameOver, IT_CLICHES, newTally, pressureLevel, qualityOf, resolveIgnore, spawnInterval, stageFor, tallyChoice, tallyConsequence, tallyIgnore, tallyTotal, type LeagueEntry } from "./engine";
 import { CARDS, cardById, escalatedClone, severityOf } from "./cards";
 
 const base = { stress: 50, risk: 50, cost: 50, confidence: 50, chill: 50 };
@@ -89,6 +89,23 @@ describe("points tally", () => {
     const t0 = newTally();
     tallyChoice(t0, 50, "good", false);
     expect(t0.choicesMade).toBe(0);
+  });
+});
+describe("ephemeral league table", () => {
+  const e = (name: string, score: number, chill = 0, survived = 60, won = false): LeagueEntry => ({ name, score, chill, survived, won });
+  it("ranks by score, then chill, and does not mutate the input", () => {
+    const start = [e("Low Lou", 100, 90)];
+    const out = addToLeague(start, e("High Hilary", 500, 10));
+    expect(out.map((x) => x.name)).toEqual(["High Hilary", "Low Lou"]);
+    expect(start).toHaveLength(1);
+    const tied = addToLeague([e("A", 200, 20)], e("B", 200, 80));
+    expect(tied[0].name).toBe("B");
+  });
+  it("caps the table at 10 entries", () => {
+    let t: LeagueEntry[] = [];
+    for (let i = 0; i < 12; i++) t = addToLeague(t, e(`CIO ${i}`, i * 10));
+    expect(t).toHaveLength(10);
+    expect(t[0].score).toBe(110);
   });
 });
 describe("card deck", () => {

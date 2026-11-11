@@ -54,3 +54,7 @@ or comes back escalated, with stress/risk up (serious 🚨 requests only wander
 > was not used — the repo is the source.
 
 Demo/QA screenshots: append `?demo=frazzled` or `?demo=beach` to the URL for a frozen game at that extreme (used for the playtest screenshots).
+
+## Full name & session league table
+
+The game asks for your full name before you start (the Start button stays disabled until you type one). Your name rides along in the HUD, and every finished run is entered into the **session league table** on the end screen — ranked by score, then Chill — alongside the points tally breakdown. The league is ephemeral: it lives in memory only, so a page refresh wipes it (and your shame) clean.

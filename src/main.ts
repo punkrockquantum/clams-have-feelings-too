@@ -1,5 +1,5 @@
 import { CARDS, cardById, escalatedClone, severityOf, type GameCard, type Choice } from "./cards";
-import { applyEffects, clicheAt, doubleSpawnChance, dueEvents, ignoreWanderChance, IGNORE_DELAY_SEC, isGameOver, newTally, pressureLevel, qualityOf, resolveIgnore, spawnInterval, stageFor, STAGE_NAMES, tallyChoice, tallyConsequence, tallyIgnore, tallyTotal, type Meters, type Scheduled, type ScoreTally } from "./engine";
+import { addToLeague, applyEffects, clicheAt, doubleSpawnChance, dueEvents, ignoreWanderChance, IGNORE_DELAY_SEC, isGameOver, newTally, pressureLevel, qualityOf, resolveIgnore, spawnInterval, stageFor, STAGE_NAMES, tallyChoice, tallyConsequence, tallyIgnore, tallyTotal, type LeagueEntry, type Meters, type Scheduled, type ScoreTally } from "./engine";
 
 const app = document.getElementById("app")!;
 
@@ -93,10 +93,18 @@ function renderIntro() {
     <div class="dots">${SLIDES.map((_, i) => `<i class="${i === slide ? "on" : ""}"></i>`).join("")}</div>
     <p><button class="ghost" id="prev" ${slide === 0 ? "disabled" : ""}>◀ Back</button>
     <button class="ghost" id="next">${slide === SLIDES.length - 1 ? "Re-read ↺" : "Next ▶"}</button></p>
-    <button class="bigbtn" id="start">▶ START THE MADNESS!</button>
+    <div class="namebox"><label for="player-name">✍️ FIRST — YOUR FULL NAME, CIO:</label>
+    <input id="player-name" maxlength="40" placeholder="e.g. Alex Morgan" value="${esc(playerName)}" autocomplete="name">
+    <small>The league table needs to know who to blame.</small></div>
+    ${leagueHTML()}
+    <button class="bigbtn" id="start" ${playerName.trim() ? "" : "disabled"}>▶ START THE MADNESS!</button>
     <p><small>Full briefing: 4 panels (~2 min to read, auto-advances) — or start instantly. No forced waiting, CIOs are busy people.</small></p>
   </div></div>`;
-  document.getElementById("start")!.onclick = () => { clearInterval(slideTimer); startGame(); };
+  document.getElementById("start")!.onclick = () => { if (!playerName.trim()) return; clearInterval(slideTimer); startGame(); };
+  const nameEl = document.getElementById("player-name") as HTMLInputElement;
+  const startEl = document.getElementById("start") as HTMLButtonElement;
+  nameEl.oninput = () => { playerName = nameEl.value; startEl.disabled = !playerName.trim(); };
+  nameEl.onkeydown = (e) => { if (e.key === "Enter" && playerName.trim()) { clearInterval(slideTimer); startGame(); } };
   document.getElementById("next")!.onclick = () => { slide = slide === SLIDES.length - 1 ? 0 : slide + 1; renderIntro(); };
   document.getElementById("prev")!.onclick = () => { if (slide > 0) slide--; renderIntro(); };
 }
@@ -111,6 +119,15 @@ let log: string[] = [], over = false, timerId: number | undefined, lastSpawn = 0
 let needsRender = false, lastRenderedSecond = -1, newestUid = 0;
 let ignoreHeat = 0, heatClock = 0;
 let tally: ScoreTally = newTally();
+/* Ephemeral league: in-memory only — refresh the page and it's gone, like your dignity. */
+let playerName = "";
+let league: LeagueEntry[] = [];
+const esc = (s: string) => s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]!));
+function leagueHTML(highlight?: LeagueEntry) {
+  if (!league.length) return "";
+  const rows = league.map((e, i) => `<tr class="${e === highlight ? "me" : ""}"><td>${i + 1}</td><td>${esc(e.name)}</td><td><b>${e.score}</b></td><td>${e.won ? "🏖️ Beach" : "💥 Wrecked"}</td><td>🏖️ ${e.chill}</td><td>${e.survived}s</td></tr>`).join("");
+  return `<div class="leaguebox"><b>🏆 SESSION LEAGUE TABLE</b> <small>(ephemeral — vanishes on refresh!)</small><table class="league"><tr><th>#</th><th>CIO</th><th>Pts</th><th>Result</th><th>Chill</th><th>Survived</th></tr>${rows}</table></div>`;
+}
 
 function shuffledDeck() { deck = CARDS.filter((x) => !x.followUp).sort(() => Math.random() - 0.5); }
 function spawn(card?: GameCard) {
@@ -216,6 +233,8 @@ function choose(choice: Choice) {
 function end(won: boolean, reason: string) {
   over = true; clearInterval(timerId);
   const st = stageFor(meters);
+  const mine: LeagueEntry = { name: playerName.trim() || "Anonymous CIO", score, chill: meters.chill, survived: Math.floor(elapsed), won };
+  league = addToLeague(league, mine);
   app.innerHTML = `<div class="end"><div class="panel end-box">
     <h1 class="logo" style="font-size:52px">${won ? "🏖️ RELAXATION!" : "💥 GAME OVER!"}</h1>
     <div style="max-width:310px;margin:0 auto">${cioSVG(won ? 5 : Math.min(st, 1))}</div>
@@ -226,6 +245,8 @@ function end(won: boolean, reason: string) {
     🎯 Choices: <b>${tally.pointsFromChoices} pts</b> from ${tally.choicesMade} call${tally.choicesMade === 1 ? "" : "s"} (${tally.goodCalls} good) · 🪤 Traps taken: ${tally.trapsTaken} · 💥 Consequences landed: ${tally.consequencesHit}<br>
     🙈 Ignores: <b>${tally.pointsFromIgnores} pts</b> — tried ${tally.ignoresTried}, ${tally.ignoresWorked} wandered off, ${tally.ignoresEscalated} came back worse</div>
     <p>Stress ${meters.stress} · Risk ${meters.risk} · Cost ${meters.cost} · Board Confidence ${meters.confidence} · Chill ${meters.chill}</p>
+    <p>👤 CIO on duty: <b>${esc(mine.name)}</b> — ranked #${league.indexOf(mine) + 1} this session</p>
+    ${leagueHTML(mine)}
     <button class="bigbtn" id="again">↺ PLAY AGAIN!</button>
     <div class="log">${log.slice(0, 12).map((l) => `<div>${l}</div>`).join("")}</div>
   </div></div>`;
@@ -249,7 +270,7 @@ function render() {
         ${meter("😱 Stress", meters.stress, "#ff9f1a")}${meter("☣️ Risk", meters.risk, "#c44dff")}${meter("💸 Cost", meters.cost, "#ff4f9a")}
         ${meter("🏛️ Board Confidence", meters.confidence, "#22c7e8", true)}${meter("🏖️ Chill", meters.chill, "#37d35a", true)}
       </div>
-      <div class="panel timer">⏱️ ${Math.max(0, Math.ceil(timeLeft))}s<div style="font-size:13px">SCORE ${score} · COMBO ×${combo}<br>📥 ${waiting().length} WAITING · 🌶️ INTENSITY Lv.${pressureLevel(elapsed)}${ignoreHeat ? `<br>🔥 IGNORE HEAT ×${ignoreHeat}` : ""}</div></div>
+      <div class="panel timer">⏱️ ${Math.max(0, Math.ceil(timeLeft))}s<div style="font-size:13px">SCORE ${score} · COMBO ×${combo}${playerName.trim() ? `<br>👤 ${esc(playerName.trim())}` : ""}<br>📥 ${waiting().length} WAITING · 🌶️ INTENSITY Lv.${pressureLevel(elapsed)}${ignoreHeat ? `<br>🔥 IGNORE HEAT ×${ignoreHeat}` : ""}</div></div>
     </div>
     <div class="layout">
       <div>
@@ -264,7 +285,7 @@ function render() {
       <div class="panel active">
         ${sel ? `<span class="who">${sel.card.emoji} ${sel.card.person}</span> <span class="dept">${sel.card.dept}</span> <span class="dept" style="background:var(--yellow);color:var(--ink)">${SEV_LABEL[severityOf(sel.card)]}</span>
         <h2>${sel.card.title}</h2><p style="font-size:18px;line-height:1.5">${sel.card.body}</p>
-        <div class="choices">${sel.card.choices.map((ch, i) => `<button class="choice" data-choice="${i}"><span class="lane">${ch.lane}</span> <b>${i + 1}. ${ch.label}</b> ${ch.partner ? `<span class="partner">★ ${ch.partner}</span>` : ""}<small>${ch.detail}</small></button>`).join("")}</div>
+        <div class="choices">${sel.card.choices.map((ch, i) => `<button class="choice" data-choice="${i}"><span class="lane">${ch.lane}</span> <b>${i + 1}. ${ch.label}</b> ${ch.partner ? `<span class="partner">${ch.partner}</span>` : ""}<small>${ch.detail}</small></button>`).join("")}</div>
         <button class="ignorebtn" id="ignore">🙈 0 · IGNORE — pretend you're in a meeting <small style="display:block;font-weight:600">They'll loiter ~${IGNORE_DELAY_SEC}s looking relaxed… then 🥱 wander off bored (${Math.round(ignoreWanderChance(severityOf(sel.card), ignoreHeat) * 100)}% for ${SEV_LABEL[severityOf(sel.card)]}${ignoreHeat ? `, Ignore Heat ×${ignoreHeat} dragging odds down` : ""}) or 😱 come back WORSE. Silly requests? Often smart. Serious ones? Brave.</small></button>
         <p><small>Click a card in the inbox to switch · Keys <span class="kbd">1</span> <span class="kbd">2</span> <span class="kbd">3</span> pick a strategy · <span class="kbd">0</span>/<span class="kbd">I</span> ignore · ⚠️ instant relief often means a delayed WHAM!</small></p>`
         : `<h2>📞 …silence…</h2><p>Enjoy it. It won't last.</p>`}
