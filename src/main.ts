@@ -1,5 +1,5 @@
 import { CARDS, cardById, escalatedClone, severityOf, type GameCard, type Choice } from "./cards";
-import { applyEffects, clicheAt, doubleSpawnChance, dueEvents, ignoreWanderChance, IGNORE_DELAY_SEC, isGameOver, pressureLevel, qualityOf, resolveIgnore, spawnInterval, stageFor, STAGE_NAMES, type Meters, type Scheduled } from "./engine";
+import { applyEffects, clicheAt, doubleSpawnChance, dueEvents, ignoreWanderChance, IGNORE_DELAY_SEC, isGameOver, newTally, pressureLevel, qualityOf, resolveIgnore, spawnInterval, stageFor, STAGE_NAMES, tallyChoice, tallyConsequence, tallyIgnore, tallyTotal, type Meters, type Scheduled, type ScoreTally } from "./engine";
 
 const app = document.getElementById("app")!;
 
@@ -110,6 +110,7 @@ let inbox: Live[] = [], selectedUid = 0, uidSeq = 1, deck: GameCard[] = [], cons
 let log: string[] = [], over = false, timerId: number | undefined, lastSpawn = 0;
 let needsRender = false, lastRenderedSecond = -1, newestUid = 0;
 let ignoreHeat = 0, heatClock = 0;
+let tally: ScoreTally = newTally();
 
 function shuffledDeck() { deck = CARDS.filter((x) => !x.followUp).sort(() => Math.random() - 0.5); }
 function spawn(card?: GameCard) {
@@ -122,7 +123,7 @@ function spawn(card?: GameCard) {
 }
 function startGame() {
   meters = { stress: 45, risk: 40, cost: 30, confidence: 55, chill: 20 };
-  timeLeft = 75; elapsed = 0; score = 0; combo = 0; bestCombo = 0; inbox = []; consequences = []; log = ["☎️ The phones begin to ring…"]; over = false; lastSpawn = 0; uidSeq = 1; selectedUid = 0; ignoreHeat = 0; heatClock = 0;
+  timeLeft = 75; elapsed = 0; score = 0; combo = 0; bestCombo = 0; inbox = []; consequences = []; log = ["☎️ The phones begin to ring…"]; over = false; lastSpawn = 0; uidSeq = 1; selectedUid = 0; ignoreHeat = 0; heatClock = 0; tally = newTally();
   shuffledDeck();
   // Guarantee the five signature incidents appear early
   for (const id of ["john-chatgpt", "charles-payroll", "fred-mythos", "sam-hnw", "alan-bitcoin"]) { const c = cardById(id)!; deck = deck.filter((x) => x.id !== id); deck.push(c); }
@@ -146,7 +147,7 @@ function tick() {
   const { due, pending } = dueEvents(consequences, elapsed); consequences = pending;
   for (const ev of due) {
     needsRender = true;
-    meters = applyEffects(meters, ev.fx); burst(ev.sfx); log.unshift(`⏰ CONSEQUENCE! ${ev.text}`); combo = 0;
+    meters = applyEffects(meters, ev.fx); tally = tallyConsequence(tally); burst(ev.sfx); log.unshift(`⏰ CONSEQUENCE! ${ev.text}`); combo = 0;
     if (ev.followUpId) spawn(cardById(ev.followUpId));
   }
   // Ignored requesters finish loitering (~3s): bored & gone, or back and WORSE.
@@ -155,7 +156,7 @@ function tick() {
     inbox = inbox.filter((x) => x.uid !== live.uid);
     const sev = severityOf(live.card);
     const r = resolveIgnore(sev, Math.random(), ignoreHeat);
-    meters = applyEffects(meters, r.fx); score += r.fx.score ?? 0; burst(r.sfx);
+    meters = applyEffects(meters, r.fx); tally = tallyIgnore(tally, r.outcome, r.fx.score ?? 0); score = tallyTotal(tally); burst(r.sfx);
     if (r.outcome === "wander") {
       ignoreHeat = Math.max(0, ignoreHeat - 1);
       log.unshift(`🥱 BORED… ${live.card.person} wandered off. Ignoring worked — this time. (+${r.fx.score} pts)`);
@@ -199,7 +200,7 @@ function choose(choice: Choice) {
   timeLeft += choice.fx.time ?? 0;
   if (q === "good") { combo++; bestCombo = Math.max(bestCombo, combo); ignoreHeat = Math.max(0, ignoreHeat - 1); } else if (q === "bad") combo = 0;
   const gained = Math.round((choice.fx.score ?? 50) * (1 + combo * 0.15));
-  score += gained;
+  tally = tallyChoice(tally, gained, q, !!choice.delayed); score = tallyTotal(tally);
   log.unshift(`${choice.fx.score && q === "good" ? "✅" : "🎲"} ${choice.label} (+${gained} pts${combo > 1 ? `, combo ×${combo}` : ""})`);
   if (choice.delayed) {
     consequences.push({ at: elapsed + choice.delayed.afterSec, text: choice.delayed.text, fx: choice.delayed.fx, followUpId: choice.delayed.followUpId, sfx: choice.delayed.sfx });
@@ -221,6 +222,9 @@ function end(won: boolean, reason: string) {
     <p class="stage-name">${won ? "BEACH MODE 🏖️" : STAGE_NAMES[st]}</p>
     <p style="font-size:18px;line-height:1.5">${reason}</p>
     <p class="scorebox">SCORE: ${score} &nbsp;·&nbsp; BEST COMBO: ×${bestCombo} &nbsp;·&nbsp; SURVIVED: ${Math.floor(elapsed)}s</p>
+    <div class="tallybox"><b>🧾 WHERE THE POINTS CAME FROM</b><br>
+    🎯 Choices: <b>${tally.pointsFromChoices} pts</b> from ${tally.choicesMade} call${tally.choicesMade === 1 ? "" : "s"} (${tally.goodCalls} good) · 🪤 Traps taken: ${tally.trapsTaken} · 💥 Consequences landed: ${tally.consequencesHit}<br>
+    🙈 Ignores: <b>${tally.pointsFromIgnores} pts</b> — tried ${tally.ignoresTried}, ${tally.ignoresWorked} wandered off, ${tally.ignoresEscalated} came back worse</div>
     <p>Stress ${meters.stress} · Risk ${meters.risk} · Cost ${meters.cost} · Board Confidence ${meters.confidence} · Chill ${meters.chill}</p>
     <button class="bigbtn" id="again">↺ PLAY AGAIN!</button>
     <div class="log">${log.slice(0, 12).map((l) => `<div>${l}</div>`).join("")}</div>

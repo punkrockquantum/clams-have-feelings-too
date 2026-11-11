@@ -83,6 +83,26 @@ export const IT_CLICHES = [
 export function clicheAt(elapsed: number): string {
   return IT_CLICHES[Math.floor(Math.max(0, elapsed) / 4) % IT_CLICHES.length];
 }
+/* ---- Points tally: where every point came from (and what it cost you) ---- */
+export interface ScoreTally {
+  pointsFromChoices: number; pointsFromIgnores: number;
+  choicesMade: number; goodCalls: number; trapsTaken: number;
+  consequencesHit: number; ignoresTried: number; ignoresWorked: number; ignoresEscalated: number;
+}
+export const newTally = (): ScoreTally => ({ pointsFromChoices: 0, pointsFromIgnores: 0, choicesMade: 0, goodCalls: 0, trapsTaken: 0, consequencesHit: 0, ignoresTried: 0, ignoresWorked: 0, ignoresEscalated: 0 });
+export function tallyChoice(t: ScoreTally, points: number, quality: "good" | "bad" | "mixed", isTrap: boolean): ScoreTally {
+  return { ...t, pointsFromChoices: t.pointsFromChoices + points, choicesMade: t.choicesMade + 1, goodCalls: t.goodCalls + (quality === "good" ? 1 : 0), trapsTaken: t.trapsTaken + (isTrap ? 1 : 0) };
+}
+export function tallyIgnore(t: ScoreTally, outcome: "wander" | "escalate", points: number): ScoreTally {
+  return outcome === "wander"
+    ? { ...t, pointsFromIgnores: t.pointsFromIgnores + points, ignoresTried: t.ignoresTried + 1, ignoresWorked: t.ignoresWorked + 1 }
+    : { ...t, ignoresTried: t.ignoresTried + 1, ignoresEscalated: t.ignoresEscalated + 1 };
+}
+export function tallyConsequence(t: ScoreTally): ScoreTally {
+  return { ...t, consequencesHit: t.consequencesHit + 1 };
+}
+export const tallyTotal = (t: ScoreTally): number => t.pointsFromChoices + t.pointsFromIgnores;
+
 export function qualityOf(fx: Partial<Effects>): "good" | "bad" | "mixed" {
   const chaos = (fx.stress ?? 0) + (fx.risk ?? 0) + (fx.cost ?? 0) - (fx.confidence ?? 0) - (fx.chill ?? 0);
   if (chaos <= -8) return "good";

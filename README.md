@@ -11,6 +11,10 @@ worse follow-up cards. Reach 100 Chill (or survive to the whistle with the compa
 calm) and our hero evolves from wild hair & bloodshot eyes to Hawaiian shirt,
 shorts and sunglasses. Let any chaos meter max out and it's game over.
 
+The end screen breaks down exactly where your score came from — points from
+choices vs. points from successful Ignores, good calls, traps taken, delayed
+consequences landed, and ignores that came back worse.
+
 Partner choices are woven in as real options: colocation partners (private
 data halls, high-density AI colocation, private interconnection), cloud &
 enterprise software partners (cloud infrastructure, managed databases,
